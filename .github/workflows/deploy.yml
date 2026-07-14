@@ -19,7 +19,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Install API deps
         run: cd workers/api && npm ci
@@ -49,6 +49,7 @@ jobs:
   deploy-workers:
     name: Deploy Workers
     needs: test
+    if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -58,7 +59,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Install dependencies
         run: cd workers/${{ matrix.worker }} && npm ci
@@ -72,19 +73,20 @@ jobs:
   deploy-dashboard:
     name: Deploy Dashboard
     needs: test
+    if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Install dependencies
         run: cd dashboard && npm ci
 
       - name: Build
-        run: cd dashboard && npm run build
+        run: cd dashboard && npx vite build
 
       - name: Deploy to Pages
         env:
