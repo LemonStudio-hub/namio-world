@@ -1,0 +1,14 @@
+name = "namio-email"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "namio-db"
+database_id = "<your-database-id>"
+
+[vars]
+MAX_MAIL_SIZE = "5242880"
+RATE_LIMIT_COUNT = "3"
+RATE_LIMIT_WINDOW = "300"

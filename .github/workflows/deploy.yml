@@ -1,0 +1,93 @@
+name: Deploy Namio.World
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+jobs:
+  # ---- 测试 ----
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install API deps
+        run: cd workers/api && npm ci
+
+      - name: Install Gateway deps
+        run: cd workers/gateway && npm ci
+
+      - name: Install Email deps
+        run: cd workers/email && npm ci
+
+      - name: Install Dashboard deps
+        run: cd dashboard && npm ci
+
+      - name: Run API tests
+        run: cd workers/api && npx vitest run
+
+      - name: Run Gateway tests
+        run: cd workers/gateway && npx vitest run
+
+      - name: Run Email tests
+        run: cd workers/email && npx vitest run
+
+      - name: Run Dashboard tests
+        run: cd dashboard && npx vitest run
+
+  # ---- 部署 Workers ----
+  deploy-workers:
+    name: Deploy Workers
+    needs: test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        worker: [api, gateway, email]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: workers/${{ matrix.worker }}/package-lock.json
+
+      - name: Install dependencies
+        run: cd workers/${{ matrix.worker }} && npm ci
+
+      - name: Deploy ${{ matrix.worker }}
+        run: cd workers/${{ matrix.worker }} && npx wrangler deploy
+
+  # ---- 部署 Dashboard ----
+  deploy-dashboard:
+    name: Deploy Dashboard
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: dashboard/package-lock.json
+
+      - name: Install dependencies
+        run: cd dashboard && npm ci
+
+      - name: Build
+        run: cd dashboard && npm run build
+
+      - name: Deploy to Pages
+        run: cd dashboard && npx wrangler pages deploy dist --project-name=namio-dashboard

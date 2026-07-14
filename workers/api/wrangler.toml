@@ -1,0 +1,17 @@
+name = "namio-api"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+routes = [
+  { pattern = "namio.world/api/*", zone_name = "namio.world" }
+]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "namio-db"
+database_id = "<your-database-id>"
+
+[vars]
+JWT_SECRET = "<your-jwt-secret>"
+ALLOWED_ORIGINS = "https://namio.world,https://www.namio.world"
