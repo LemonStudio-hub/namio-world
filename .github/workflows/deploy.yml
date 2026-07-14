@@ -3,15 +3,6 @@ name: Deploy Nomio.World
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - '*.md'
-      - 'docs/**'
-      - 'LICENSE'
-      - '.gitignore'
-      - 'SECURITY.md'
-      - 'CONTRIBUTING.md'
-      - 'CODE_OF_CONDUCT.md'
-      - 'CHANGELOG.md'
   workflow_dispatch:
 
 jobs:

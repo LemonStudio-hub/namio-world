@@ -44,12 +44,6 @@ const router = createRouter({
       component: () => import('@/views/MailboxView.vue'),
       meta: { requiresAuth: true },
     },
-    {
-      path: '/privacy',
-      name: 'Privacy',
-      component: () => import('@/views/PrivacyView.vue'),
-      meta: { guest: true },
-    },
   ],
 });
 

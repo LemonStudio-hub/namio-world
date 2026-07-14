@@ -78,7 +78,6 @@ const techStack = [
           <a href="#features">功能</a>
           <a href="#how">工作原理</a>
           <a href="#tech">技术栈</a>
-          <router-link to="/privacy">隐私政策</router-link>
           <router-link to="/login">登录</router-link>
           <router-link to="/register" class="btn btn-primary btn-sm">注册</router-link>
         </div>
@@ -257,7 +256,6 @@ const techStack = [
           <div class="footer-logo"><span>Nomio</span>.World</div>
           <div class="footer-links">
             <a href="https://github.com/LemonStudio-hub/nomio-world" target="_blank">GitHub</a>
-            <router-link to="/privacy">隐私政策</router-link>
             <router-link to="/login">登录</router-link>
             <router-link to="/register">注册</router-link>
           </div>
