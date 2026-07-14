@@ -5,10 +5,6 @@ on:
     branches: [main]
   workflow_dispatch:
 
-env:
-  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
 jobs:
   # ---- 测试 ----
   test:
@@ -49,7 +45,6 @@ jobs:
   deploy-workers:
     name: Deploy Workers
     needs: test
-    if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -73,7 +68,6 @@ jobs:
   deploy-dashboard:
     name: Deploy Dashboard
     needs: test
-    if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
