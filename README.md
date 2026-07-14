@@ -146,6 +146,7 @@ cd dashboard && npx vitest run --coverage
 | 文档 | 说明 |
 |------|------|
 | [技术文档](docs.md) | 架构设计、API 接口、数据模型、安全机制 |
+| [隐私政策](dashboard/src/views/PrivacyView.vue) | 个人信息收集、使用与保护声明 |
 | [更新日志](CHANGELOG.md) | 版本历史与变更记录 |
 | [贡献指南](CONTRIBUTING.md) | 如何参与贡献 |
 | [行为准则](CODE_OF_CONDUCT.md) | 社区行为规范 |
