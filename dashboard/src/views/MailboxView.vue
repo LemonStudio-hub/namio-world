@@ -1617,12 +1617,13 @@ onMounted(() => loadMails());
 .action-btn.starred {
   color: #f59e0b;
   border-color: #f59e0b;
-  background: #fffbeb;
+  background: var(--color-warning-soft);
   box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
 }
 
 .action-btn.starred:hover {
-  background: #fef3c7;
+  background: var(--color-warning-soft);
+  opacity: 0.8;
   transform: translateY(-2px) scale(1.05);
 }
 

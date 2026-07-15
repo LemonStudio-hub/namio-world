@@ -414,8 +414,8 @@ const techStack = [
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--color-primary);
-  background: rgba(79, 70, 229, 0.06);
-  border: 1px solid rgba(79, 70, 229, 0.12);
+  background: var(--color-primary-soft);
+  border: 1px solid var(--color-primary-muted);
   margin-bottom: 32px;
   letter-spacing: 0.02em;
   animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -479,10 +479,15 @@ const techStack = [
   background: #1e1e2e;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05);
   text-align: left;
   min-width: 340px;
 }
+
+.dark-mode .preview-card {
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
 .preview-header {
   display: flex;
   align-items: center;
