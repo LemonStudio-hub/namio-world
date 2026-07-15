@@ -8,14 +8,10 @@
 
 import { Hono } from 'hono';
 import { success, fail } from '../utils/response';
+import { getUsername } from '../middleware/auth';
 import type { Env } from '../index';
 
 export const settingsRoutes = new Hono<{ Bindings: Env }>();
-
-function getUsername(c: any): string {
-  const payload = c.get('jwtPayload') as { sub: string };
-  return payload.sub;
-}
 
 // GET /api/settings/email
 settingsRoutes.get('/email', async (c) => {

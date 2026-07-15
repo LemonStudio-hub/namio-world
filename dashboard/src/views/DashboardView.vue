@@ -3,7 +3,7 @@ import { ref, onMounted, computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { getDomain, getDomainStats } from '@/api/domains';
 import { getMails, getMailStats } from '@/api/mails';
-import { formatBytes, formatFullDate } from '@/utils/format';
+import { formatBytes, formatFullDate, formatDateShort } from '@/utils/format';
 import type { DomainInfo, DomainStats } from '@/api/domains';
 import type { MailListData } from '@/api/mails';
 
@@ -40,21 +40,6 @@ const currentDate = computed(() => {
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return '从未';
   return formatFullDate(dateStr);
-}
-
-function formatDateShort(dateStr: string): string {
-  const date = new Date(dateStr);
-  const now = new Date();
-  const diff = now.getTime() - date.getTime();
-  const minutes = Math.floor(diff / 60000);
-  const hours = Math.floor(diff / 3600000);
-  const days = Math.floor(diff / 86400000);
-
-  if (minutes < 1) return '刚刚';
-  if (minutes < 60) return `${minutes}分钟前`;
-  if (hours < 24) return `${hours}小时前`;
-  if (days < 7) return `${days}天前`;
-  return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
 }
 
 const verifyBadgeClass = computed(() => {

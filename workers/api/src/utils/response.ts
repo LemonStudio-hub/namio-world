@@ -3,6 +3,7 @@
  */
 
 import type { Context } from 'hono';
+import type { StatusCode } from 'hono/utils/http-status';
 
 export interface ApiResponse<T = unknown> {
   success: boolean;
@@ -13,13 +14,13 @@ export interface ApiResponse<T = unknown> {
   };
 }
 
-export function success<T>(c: Context, data: T, status = 200) {
-  return c.json({ success: true, data } as ApiResponse<T>, status as any);
+export function success<T>(c: Context, data: T, status: StatusCode = 200) {
+  return c.json({ success: true, data } as ApiResponse<T>, status);
 }
 
-export function fail(c: Context, code: string, message: string, status = 400) {
+export function fail(c: Context, code: string, message: string, status: StatusCode = 400) {
   return c.json(
     { success: false, error: { code, message } } as ApiResponse,
-    status as any,
+    status,
   );
 }
