@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
-import { getMails, getMail, deleteMail, deleteMails } from '@/api/mails';
+import { getMails, getMail, deleteMail, deleteMails, registerEmail } from '@/api/mails';
 import { getEmailSettings, updateEmailSettings } from '@/api/settings';
 import type { MailItem, MailDetail, Pagination } from '@/api/mails';
 import type { EmailSettings } from '@/api/settings';
@@ -21,8 +21,11 @@ const settingsLoading = ref(false);
 const forwardEmail = ref('');
 const emailEnabled = ref(true);
 const settingsSaved = ref(false);
+const registering = ref(false);
+const registerError = ref('');
+const hasEmail = ref(false);
 
-const activeTab = ref<'inbox' | 'settings'>('inbox');
+const activeTab = ref<'inbox' | 'register' | 'settings'>('inbox');
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('zh-CN', {
@@ -48,10 +51,33 @@ async function loadMails(page = 1) {
     mails.value = res.data.mails;
     pagination.value = res.data.pagination;
     selectedIds.value.clear();
+    hasEmail.value = true;
   } catch {
-    // 静默处理
+    // 用户可能还没有注册邮箱
+    hasEmail.value = false;
   } finally {
     loading.value = false;
+  }
+}
+
+async function handleRegisterEmail() {
+  registerError.value = '';
+  registering.value = true;
+  try {
+    const res = await registerEmail(forwardEmail.value || undefined);
+    hasEmail.value = true;
+    settings.value = {
+      email: res.data.email,
+      forwardEmail: res.data.forwardEmail,
+      emailEnabled: res.data.emailEnabled,
+      totalMailSize: 0,
+      quota: 100 * 1024 * 1024,
+    };
+    activeTab.value = 'settings';
+  } catch (e: any) {
+    registerError.value = e?.data?.error?.message || '注册失败';
+  } finally {
+    registering.value = false;
   }
 }
 
@@ -159,9 +185,42 @@ onMounted(() => loadMails());
     </div>
 
     <div class="tabs">
-      <button class="tab" :class="{ active: activeTab === 'inbox' }" @click="switchTab('inbox')">收件箱</button>
-      <button class="tab" :class="{ active: activeTab === 'settings' }" @click="switchTab('settings')">设置</button>
+      <button v-if="hasEmail" class="tab" :class="{ active: activeTab === 'inbox' }" @click="switchTab('inbox')">收件箱</button>
+      <button v-if="!hasEmail" class="tab" :class="{ active: activeTab === 'register' }" @click="switchTab('register')">注册邮箱</button>
+      <button v-if="hasEmail" class="tab" :class="{ active: activeTab === 'settings' }" @click="switchTab('settings')">设置</button>
     </div>
+
+    <!-- 注册邮箱 -->
+    <template v-if="activeTab === 'register'">
+      <div class="card">
+        <div class="card-title">注册邮箱</div>
+        <p style="font-size: 0.875rem; color: var(--color-text-secondary); margin-bottom: 20px; line-height: 1.6">
+          注册后你将获得 <strong>{{ auth.username }}@nomio.world</strong> 邮箱地址。
+          任何发送到该地址的邮件都会被接收并存储。
+        </p>
+
+        <div v-if="registerError" class="alert alert-error">{{ registerError }}</div>
+
+        <form @submit.prevent="handleRegisterEmail">
+          <div class="form-group">
+            <label for="forwardEmail">转发邮箱（可选）</label>
+            <input
+              id="forwardEmail"
+              v-model="forwardEmail"
+              type="email"
+              placeholder="your-email@gmail.com"
+              class="focus-ring"
+            />
+            <div class="hint">收到的邮件将自动转发到此邮箱，留空则不转发</div>
+          </div>
+
+          <button class="btn btn-primary" type="submit" :disabled="registering">
+            <span v-if="registering" class="spinner"></span>
+            <span v-else>注册邮箱</span>
+          </button>
+        </form>
+      </div>
+    </template>
 
     <!-- 收件箱 -->
     <template v-if="activeTab === 'inbox'">

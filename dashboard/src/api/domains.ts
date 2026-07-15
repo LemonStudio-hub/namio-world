@@ -12,8 +12,27 @@ export interface DomainInfo {
   created_at: string;
 }
 
+export interface RegisterDomainParams {
+  originUrl: string;
+  originHost?: string;
+}
+
+export interface RegisterDomainData {
+  originUrl: string;
+  originHost: string;
+  verifyToken: string;
+  verifyStatus: string;
+}
+
 export async function getDomain() {
   return request<DomainInfo>('/domains');
+}
+
+export async function registerDomain(params: RegisterDomainParams) {
+  return request<RegisterDomainData>('/domains/register', {
+    method: 'POST',
+    body: params,
+  });
 }
 
 export async function updateDomain(originUrl: string, originHost?: string) {

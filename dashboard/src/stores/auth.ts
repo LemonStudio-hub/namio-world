@@ -29,10 +29,10 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  async function register(username: string, password: string, originUrl: string) {
+  async function register(username: string, password: string) {
     loading.value = true;
     try {
-      const res = await apiRegister({ username, password, originUrl });
+      const res = await apiRegister({ username, password });
       token.value = res.data.token;
       localStorage.setItem('nomio_token', res.data.token);
       await fetchUser();

@@ -31,6 +31,19 @@ export interface MailListData {
   pagination: Pagination;
 }
 
+export interface RegisterEmailData {
+  email: string;
+  forwardEmail: string | null;
+  emailEnabled: boolean;
+}
+
+export async function registerEmail(forwardEmail?: string) {
+  return request<RegisterEmailData>('/mails/register', {
+    method: 'POST',
+    body: { forwardEmail: forwardEmail || null },
+  });
+}
+
 export async function getMails(page = 1, limit = 20, unread = false) {
   const params = new URLSearchParams({
     page: String(page),

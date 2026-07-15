@@ -7,7 +7,6 @@ import request from './request';
 export interface RegisterParams {
   username: string;
   password: string;
-  originUrl: string;
 }
 
 export interface LoginParams {
@@ -19,19 +18,21 @@ export interface AuthData {
   token: string;
   user: {
     username: string;
-    originUrl?: string;
-    verifyToken?: string;
+    hasDomain: boolean;
+    hasEmail: boolean;
   };
 }
 
 export interface UserProfile {
   username: string;
-  origin_url: string;
-  origin_host: string;
+  origin_url: string | null;
+  origin_host: string | null;
   forward_email: string | null;
   email_enabled: boolean;
   status: string;
   verify_status: string;
+  has_domain: boolean;
+  has_email: boolean;
   created_at: string;
   last_login_at: string | null;
   total_mail_size: number;

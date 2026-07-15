@@ -7,14 +7,13 @@ const auth = useAuthStore();
 const username = ref('');
 const password = ref('');
 const confirmPassword = ref('');
-const originUrl = ref('');
 const error = ref('');
 
 async function handleSubmit() {
   error.value = '';
 
-  if (!username.value || !password.value || !originUrl.value) {
-    error.value = '请填写所有必填项';
+  if (!username.value || !password.value) {
+    error.value = '请填写用户名和密码';
     return;
   }
   if (password.value.length < 8) {
@@ -25,13 +24,9 @@ async function handleSubmit() {
     error.value = '两次输入的密码不一致';
     return;
   }
-  if (!originUrl.value.startsWith('https://')) {
-    error.value = '源站地址必须以 https:// 开头';
-    return;
-  }
 
   try {
-    await auth.register(username.value.toLowerCase(), password.value, originUrl.value);
+    await auth.register(username.value.toLowerCase(), password.value);
   } catch (e: any) {
     error.value = e?.data?.error?.message || '注册失败，请稍后重试';
   }
@@ -57,19 +52,7 @@ async function handleSubmit() {
             autocomplete="username"
             class="focus-ring"
           />
-          <div class="hint">注册后将获得 alice.nomio.world 域名</div>
-        </div>
-
-        <div class="form-group">
-          <label for="originUrl">源站地址</label>
-          <input
-            id="originUrl"
-            v-model="originUrl"
-            type="url"
-            placeholder="https://myapp.vercel.app"
-            class="focus-ring"
-          />
-          <div class="hint">你的网站必须支持 HTTPS</div>
+          <div class="hint">登录后可注册二级域名和邮箱</div>
         </div>
 
         <div class="form-group">

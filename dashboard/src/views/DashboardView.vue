@@ -11,6 +11,8 @@ const auth = useAuthStore();
 const domain = ref<DomainInfo | null>(null);
 const mailData = ref<MailListData | null>(null);
 const loading = ref(true);
+const hasDomain = ref(false);
+const hasEmail = ref(false);
 
 function formatBytes(bytes: number): string {
   if (bytes === 0) return '0 B';
@@ -47,9 +49,17 @@ const verifyBadgeText = computed(() => {
 
 onMounted(async () => {
   try {
-    const [domainRes, mailRes] = await Promise.all([getDomain(), getMails(1, 5)]);
-    domain.value = domainRes.data;
-    mailData.value = mailRes.data;
+    const [domainRes, mailRes] = await Promise.allSettled([getDomain(), getMails(1, 5)]);
+
+    if (domainRes.status === 'fulfilled') {
+      domain.value = domainRes.value.data;
+      hasDomain.value = true;
+    }
+
+    if (mailRes.status === 'fulfilled') {
+      mailData.value = mailRes.value.data;
+      hasEmail.value = true;
+    }
   } catch {
     // 静默处理
   } finally {
@@ -70,20 +80,51 @@ onMounted(async () => {
     </div>
 
     <template v-else>
+      <!-- 注册提示 -->
+      <div v-if="!hasDomain || !hasEmail" class="card" style="margin-bottom: 24px; border-color: var(--color-primary-muted);">
+        <div class="card-title" style="color: var(--color-primary);">快速开始</div>
+        <p style="font-size: 0.875rem; color: var(--color-text-secondary); margin-bottom: 16px; line-height: 1.6">
+          欢迎使用 Namio.World！请先完成以下步骤来设置你的数字身份：
+        </p>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <router-link v-if="!hasDomain" to="/domain" class="btn btn-primary">
+            注册二级域名
+          </router-link>
+          <router-link v-if="!hasEmail" to="/mailbox" class="btn btn-outline">
+            注册邮箱
+          </router-link>
+        </div>
+      </div>
+
       <div class="stats-grid stagger">
         <div class="stat-card">
           <div class="label">域名</div>
-          <div class="value" style="font-size: 1rem">{{ auth.username }}.nomio.world</div>
+          <div class="value" style="font-size: 1rem">
+            <template v-if="hasDomain">
+              {{ auth.username }}.nomio.world
+            </template>
+            <template v-else>
+              <router-link to="/domain" style="font-size: 0.875rem; color: var(--color-primary);">点击注册</router-link>
+            </template>
+          </div>
         </div>
         <div class="stat-card">
           <div class="label">源站验证</div>
           <div class="value">
-            <span :class="verifyBadgeClass">{{ verifyBadgeText }}</span>
+            <span v-if="hasDomain" :class="verifyBadgeClass">{{ verifyBadgeText }}</span>
+            <span v-else class="badge badge-warning">未注册</span>
           </div>
         </div>
         <div class="stat-card">
-          <div class="label">邮件数量</div>
-          <div class="value">{{ mailData?.pagination.total || 0 }}</div>
+          <div class="label">邮箱</div>
+          <div class="value">
+            <template v-if="hasEmail">
+              {{ mailData?.pagination.total || 0 }} 封
+            </template>
+            <template v-else>
+              <router-link to="/mailbox" style="font-size: 0.875rem; color: var(--color-primary);">点击注册</router-link>
+            </template>
+          </div>
         </div>
         <div class="stat-card">
           <div class="label">邮箱用量</div>
