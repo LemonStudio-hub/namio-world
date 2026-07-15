@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { getMe } from '@/api/auth';
+import { formatBytes, formatFullDate } from '@/utils/format';
 import type { UserProfile } from '@/api/auth';
 
 const auth = useAuthStore();
@@ -30,21 +31,7 @@ onMounted(async () => {
 
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return '从未';
-  return new Date(dateStr).toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
-
-function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 B';
-  const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return (bytes / Math.pow(k, i)).toFixed(1) + ' ' + sizes[i];
+  return formatFullDate(dateStr);
 }
 
 async function handleChangePassword() {

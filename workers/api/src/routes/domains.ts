@@ -1,9 +1,10 @@
 /**
  * 域名管理路由（需 JWT 认证）
- * GET    /domains          获取域名配置
- * PUT    /domains          更新源站地址
- * DELETE /domains          删除域名（释放用户名）
- * POST   /domains/verify   触发源站验证
+ * GET    /domains              获取域名配置
+ * POST   /domains/register     注册域名
+ * PUT    /domains              更新源站地址
+ * DELETE /domains              删除域名（释放用户名）
+ * POST   /domains/verify       触发源站验证
  */
 
 import { Hono } from 'hono';
@@ -34,6 +35,59 @@ domainRoutes.get('/', async (c) => {
   }
 
   return success(c, user);
+});
+
+// POST /api/domains/register
+domainRoutes.post('/register', async (c) => {
+  const username = getUsername(c);
+
+  let body: { originUrl?: string; originHost?: string };
+  try {
+    body = await c.req.json();
+  } catch {
+    return fail(c, 'INVALID_JSON', '请求体格式无效', 400);
+  }
+
+  const { originUrl, originHost } = body;
+  if (!originUrl) {
+    return fail(c, 'INVALID_INPUT', '源站地址为必填', 400);
+  }
+
+  const originCheck = validateOriginUrl(originUrl);
+  if (!originCheck.valid) {
+    return fail(c, 'INVALID_INPUT', originCheck.error!, 400);
+  }
+
+  const user = await c.env.DB.prepare(
+    'SELECT id, has_domain FROM users WHERE username = ?',
+  )
+    .bind(username)
+    .first<{ id: number; has_domain: number }>();
+
+  if (!user) {
+    return fail(c, 'NOT_FOUND', '用户不存在', 404);
+  }
+
+  if (user.has_domain) {
+    return fail(c, 'CONFLICT', '域名已注册', 409);
+  }
+
+  const hostname = new URL(originUrl).hostname;
+  const host = originHost || hostname;
+  const verifyToken = crypto.randomUUID().replace(/-/g, '').substring(0, 32);
+
+  await c.env.DB.prepare(
+    'UPDATE users SET origin_url = ?, origin_host = ?, has_domain = 1, verify_token = ?, verify_status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+  )
+    .bind(originUrl, host, verifyToken, 'pending', user.id)
+    .run();
+
+  return success(c, {
+    originUrl,
+    originHost: host,
+    verifyToken,
+    verifyStatus: 'pending',
+  });
 });
 
 // PUT /api/domains

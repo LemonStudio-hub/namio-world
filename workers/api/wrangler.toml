@@ -1,6 +1,6 @@
 name = "nomio-api"
 main = "src/index.ts"
-compatibility_date = "2024-01-01"
+compatibility_date = "2024-12-01"
 compatibility_flags = ["nodejs_compat"]
 
 
@@ -10,5 +10,6 @@ database_name = "nomio-db"
 database_id = "f0616555-1157-4062-b9ef-f27d56831d02"
 
 [vars]
-JWT_SECRET = "8d584ef0ba266b97d22be95fe97684003353e6b39f8373f33e9b0488afcd28f8"
-ALLOWED_ORIGINS = "*"
+# JWT_SECRET should be set via: wrangler secret put JWT_SECRET
+# ALLOWED_ORIGINS should be set to your actual frontend domain
+ALLOWED_ORIGINS = "https://nomio-dashboard.pages.dev,http://localhost:5173"

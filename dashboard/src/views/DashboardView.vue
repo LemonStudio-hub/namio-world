@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { getDomain } from '@/api/domains';
 import { getMails } from '@/api/mails';
+import { formatBytes, formatFullDate } from '@/utils/format';
 import type { DomainInfo } from '@/api/domains';
 import type { MailListData } from '@/api/mails';
 
@@ -14,23 +15,9 @@ const loading = ref(true);
 const hasDomain = ref(false);
 const hasEmail = ref(false);
 
-function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 B';
-  const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return (bytes / Math.pow(k, i)).toFixed(1) + ' ' + sizes[i];
-}
-
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return '从未';
-  return new Date(dateStr).toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  return formatFullDate(dateStr);
 }
 
 const verifyBadgeClass = computed(() => {
@@ -49,7 +36,7 @@ const verifyBadgeText = computed(() => {
 
 onMounted(async () => {
   try {
-    const [domainRes, mailRes] = await Promise.allSettled([getDomain(), getMails(1, 5)]);
+    const [domainRes, mailRes] = await Promise.allSettled([getDomain(), getMails({ page: 1, limit: 5 })]);
 
     if (domainRes.status === 'fulfilled') {
       domain.value = domainRes.value.data;

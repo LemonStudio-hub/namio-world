@@ -5,8 +5,18 @@ import { getMails, getMail, deleteMail, deleteMails, registerEmail, markAsRead, 
 import { getEmailSettings, updateEmailSettings } from '@/api/settings';
 import type { MailItem, MailDetail, Pagination, MailSearchParams } from '@/api/mails';
 import type { EmailSettings } from '@/api/settings';
+import DOMPurify from 'dompurify';
 
 const auth = useAuthStore();
+
+// 安全的HTML净化函数
+function sanitizeHtml(html: string): string {
+  return DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'a', 'ul', 'ol', 'li', 'blockquote', 'code', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'img', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'div', 'span'],
+    ALLOWED_ATTR: ['href', 'target', 'rel', 'src', 'alt', 'class', 'style'],
+    ALLOW_DATA_ATTR: false,
+  });
+}
 
 // 邮件列表状态
 const mails = ref<MailItem[]>([]);
@@ -760,7 +770,7 @@ onMounted(() => loadMails());
 
             <!-- 邮件正文 -->
             <div class="detail-body">
-              <div v-if="currentMail.html_body" class="html-body" v-html="currentMail.html_body"></div>
+              <div v-if="currentMail.html_body" class="html-body" v-html="sanitizeHtml(currentMail.html_body)"></div>
               <div v-else class="text-body">{{ currentMail.text_body || currentMail.body }}</div>
             </div>
           </div>
