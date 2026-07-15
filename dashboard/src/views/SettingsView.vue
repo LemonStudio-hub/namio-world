@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/auth';
 import { getMe, changePassword, deleteAccount } from '@/api/auth';
 import { getSeoSettings, updateSeoSettings, SEO_VARIANT_OPTIONS, SEO_POSITION_OPTIONS } from '@/api/settings';
 import { formatBytes, formatFullDate } from '@/utils/format';
+import Icon from '@/components/icons/Icon.vue';
 import type { UserProfile } from '@/api/auth';
 import type { SeoSettings, SeoVariant, SeoPosition } from '@/api/settings';
 
@@ -153,21 +154,24 @@ async function handleDeleteAccount() {
           :class="{ active: activeTab === 'account' }"
           @click="activeTab = 'account'"
         >
-          👤 账号信息
+          <Icon name="user" :size="16" />
+          账号信息
         </button>
         <button
           class="tab"
           :class="{ active: activeTab === 'seo' }"
           @click="activeTab = 'seo'"
         >
-          🔍 SEO 设置
+          <Icon name="search" :size="16" />
+          SEO 设置
         </button>
         <button
           class="tab"
           :class="{ active: activeTab === 'security' }"
           @click="activeTab = 'security'"
         >
-          🔒 安全设置
+          <Icon name="lock" :size="16" />
+          安全设置
         </button>
       </div>
 

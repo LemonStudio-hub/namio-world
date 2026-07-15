@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { getMails, getMail, deleteMail, deleteMails, registerEmail, markAsRead, markAsUnread, toggleStar, markMultipleAsRead, markMultipleAsUnread } from '@/api/mails';
 import { getEmailSettings, updateEmailSettings } from '@/api/settings';
+import Icon from '@/components/icons/Icon.vue';
 import type { MailItem, MailDetail, Pagination, MailSearchParams } from '@/api/mails';
 import type { EmailSettings } from '@/api/settings';
 import DOMPurify from 'dompurify';
@@ -362,7 +363,7 @@ onMounted(() => loadMails());
     <template v-if="!hasEmail">
       <div class="register-container">
         <div class="register-card">
-          <div class="register-icon">📧</div>
+          <div class="register-icon"><Icon name="mail" :size="48" /></div>
           <h2>注册邮箱</h2>
           <p>注册后你将获得 <strong>{{ auth.username }}@nomio.world</strong> 邮箱地址</p>
           <p class="register-hint">任何发送到该地址的邮件都会被接收并存储</p>
@@ -385,7 +386,7 @@ onMounted(() => loadMails());
       <div class="mailbox-toolbar">
         <div class="toolbar-left">
           <h1 class="mailbox-title">
-            <span class="title-icon">📬</span>
+            <span class="title-icon"><Icon name="inbox" :size="24" /></span>
             收件箱
             <span v-if="unreadCount > 0" class="unread-badge">{{ unreadCount }}</span>
           </h1>
@@ -550,7 +551,7 @@ onMounted(() => loadMails());
 
           <!-- 空状态 -->
           <div v-else-if="mails.length === 0" class="empty-state">
-            <div class="empty-icon">📭</div>
+            <div class="empty-icon"><Icon name="inbox" :size="64" /></div>
             <h3>{{ searchQuery ? '没有找到匹配的邮件' : '收件箱为空' }}</h3>
             <p>{{ searchQuery ? '尝试使用不同的搜索词' : '还没有收到任何邮件' }}</p>
           </div>

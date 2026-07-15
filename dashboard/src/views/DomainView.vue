@@ -16,6 +16,7 @@ import {
   WAF_RULE_TYPE_ICONS,
 } from '@/api/waf';
 import { formatBytes, formatFullDate, formatDateShort } from '@/utils/format';
+import Icon from '@/components/icons/Icon.vue';
 import type { DomainInfo, DomainStats } from '@/api/domains';
 import type { WafRule, WafStats, CreateWafRuleParams, WafRuleType, WafAction } from '@/api/waf';
 
@@ -392,7 +393,8 @@ async function handleVerify() {
             :class="{ active: activeTab === 'waf' }"
             @click="activeTab = 'waf'"
           >
-            🛡️ WAF防护
+            <Icon name="shield" :size="16" />
+            WAF防护
           </button>
         </div>
 
@@ -401,7 +403,7 @@ async function handleVerify() {
           <!-- 统计卡片 -->
           <div class="stats-grid stagger">
             <div class="stat-card">
-              <div class="stat-icon">🌐</div>
+              <div class="stat-icon"><Icon name="globe" :size="24" /></div>
               <div class="stat-content">
                 <div class="stat-value">{{ auth.username }}.nomio.world</div>
                 <div class="stat-label">域名</div>
@@ -409,7 +411,7 @@ async function handleVerify() {
             </div>
 
             <div class="stat-card">
-              <div class="stat-icon">✅</div>
+              <div class="stat-icon"><Icon name="check-circle" :size="24" /></div>
               <div class="stat-content">
                 <div class="stat-value" :style="{ color: getVerifyStatusColor(domain?.verify_status || '') }">
                   {{ getVerifyStatusText(domain?.verify_status || '') }}
@@ -419,7 +421,7 @@ async function handleVerify() {
             </div>
 
             <div class="stat-card">
-              <div class="stat-icon">📧</div>
+              <div class="stat-icon"><Icon name="mail" :size="24" /></div>
               <div class="stat-content">
                 <div class="stat-value">{{ stats?.mail.total || 0 }}</div>
                 <div class="stat-label">邮件数量</div>
@@ -427,7 +429,7 @@ async function handleVerify() {
             </div>
 
             <div class="stat-card">
-              <div class="stat-icon">📊</div>
+              <div class="stat-icon"><Icon name="database" :size="24" /></div>
               <div class="stat-content">
                 <div class="stat-value">{{ formatBytes(stats?.mail.totalSize || 0) }}</div>
                 <div class="stat-label">存储用量</div>
@@ -495,11 +497,11 @@ async function handleVerify() {
             <div class="card-title">快速操作</div>
             <div class="actions-grid">
               <button class="action-btn" @click="activeTab = 'settings'">
-                <span class="action-icon">⚙️</span>
+                <span class="action-icon"><Icon name="settings" :size="24" /></span>
                 <span class="action-text">修改源站</span>
               </button>
               <button class="action-btn" @click="activeTab = 'verify'">
-                <span class="action-icon">🔍</span>
+                <span class="action-icon"><Icon name="search" :size="24" /></span>
                 <span class="action-text">验证源站</span>
               </button>
               <a
@@ -507,7 +509,7 @@ async function handleVerify() {
                 target="_blank"
                 class="action-btn"
               >
-                <span class="action-icon">🌐</span>
+                <span class="action-icon"><Icon name="globe" :size="24" /></span>
                 <span class="action-text">访问网站</span>
               </a>
             </div>
@@ -557,7 +559,7 @@ async function handleVerify() {
             <div class="card-title">源站验证</div>
             <div class="verify-status">
               <div class="verify-icon" :style="{ color: getVerifyStatusColor(domain?.verify_status || '') }">
-                {{ domain?.verify_status === 'verified' ? '✅' : '⏳' }}
+                {{ domain?.verify_status === 'verified' ? '✓' : '⏳' }}
               </div>
               <div class="verify-info">
                 <div class="verify-text" :style="{ color: getVerifyStatusColor(domain?.verify_status || '') }">
@@ -616,14 +618,14 @@ async function handleVerify() {
           <!-- WAF统计卡片 -->
           <div class="stats-grid stagger">
             <div class="stat-card">
-              <div class="stat-icon">🛡️</div>
+              <div class="stat-icon"><Icon name="shield" :size="24" /></div>
               <div class="stat-content">
                 <div class="stat-value">{{ wafStats?.total_rules || 0 }}</div>
                 <div class="stat-label">总规则数</div>
               </div>
             </div>
             <div class="stat-card">
-              <div class="stat-icon">✅</div>
+              <div class="stat-icon"><Icon name="check-circle" :size="24" /></div>
               <div class="stat-content">
                 <div class="stat-value">{{ wafStats?.enabled_rules || 0 }}</div>
                 <div class="stat-label">已启用</div>
@@ -674,7 +676,7 @@ async function handleVerify() {
           </div>
 
           <div v-else-if="wafRules.length === 0" class="empty-state card">
-            <div class="empty-icon">🛡️</div>
+            <div class="empty-icon"><Icon name="shield" :size="48" /></div>
             <h3>暂无WAF规则</h3>
             <p>点击"初始化预设规则"快速开始</p>
           </div>
@@ -822,7 +824,7 @@ async function handleVerify() {
                 class="log-item"
               >
                 <div class="log-icon" :class="{ blocked: log.is_blocked }">
-                  {{ log.is_blocked ? '🚫' : '📝' }}
+                  {{ log.is_blocked ? '✕' : '✎' }}
                 </div>
                 <div class="log-content">
                   <div class="log-title">

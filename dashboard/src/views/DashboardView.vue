@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/auth';
 import { getDomain, getDomainStats } from '@/api/domains';
 import { getMails, getMailStats } from '@/api/mails';
 import { formatBytes, formatFullDate, formatDateShort } from '@/utils/format';
+import Icon from '@/components/icons/Icon.vue';
 import type { DomainInfo, DomainStats } from '@/api/domains';
 import type { MailListData } from '@/api/mails';
 

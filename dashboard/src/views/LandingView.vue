@@ -62,7 +62,7 @@ onUnmounted(() => {
 // 特性数据
 const features = [
   {
-    icon: '🌐',
+    icon: 'globe',
     title: '免费域名',
     subtitle: 'Free Domain',
     desc: '注册即获 username.nomio.world 二级域名',
@@ -71,7 +71,7 @@ const features = [
     statsLabel: '免费',
   },
   {
-    icon: '📧',
+    icon: 'mail',
     title: '智能邮箱',
     subtitle: 'Smart Email',
     desc: '自动接收、转发、存储，一站式管理',
@@ -80,7 +80,7 @@ const features = [
     statsLabel: '存储',
   },
   {
-    icon: '⚡',
+    icon: 'zap',
     title: '边缘加速',
     subtitle: 'Edge First',
     desc: '全球 300+ 节点，延迟低于 50ms',
@@ -89,7 +89,7 @@ const features = [
     statsLabel: '延迟',
   },
   {
-    icon: '🔒',
+    icon: 'lock',
     title: '安全可靠',
     subtitle: 'Secure',
     desc: 'HTTPS、JWT、PBKDF2 全面防护',
@@ -101,17 +101,17 @@ const features = [
 
 // 步骤数据
 const steps = [
-  { num: '01', title: '注册', desc: '选择用户名', icon: '👤' },
-  { num: '02', title: '配置', desc: '设置源站', icon: '⚙️' },
-  { num: '03', title: '验证', desc: '证明所有权', icon: '✅' },
-  { num: '04', title: '上线', desc: '立即生效', icon: '🚀' },
+  { num: '01', title: '注册', desc: '选择用户名', icon: 'user' },
+  { num: '02', title: '配置', desc: '设置源站', icon: 'settings' },
+  { num: '03', title: '验证', desc: '证明所有权', icon: 'check' },
+  { num: '04', title: '上线', desc: '立即生效', icon: 'rocket' },
 ];
 
 // 统计数据
 const stats = [
   { value: '300+', label: '全球节点', icon: '🌍' },
-  { value: '<50ms', label: '响应延迟', icon: '⚡' },
-  { value: '193', label: '测试用例', icon: '✅' },
+  { value: '<50ms', label: '响应延迟', icon: 'zap' },
+  { value: '193', label: '测试用例', icon: 'check' },
   { value: 'AGPL', label: '开源协议', icon: '📖' },
 ];
 </script>
