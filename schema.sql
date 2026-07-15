@@ -18,6 +18,13 @@ CREATE TABLE IF NOT EXISTS users (
   verify_token TEXT,                          -- 源站验证 Token
   verify_status TEXT DEFAULT 'pending'        -- pending | verified | failed
     CHECK (verify_status IN ('pending', 'verified', 'failed')),
+  -- SEO 设置
+  seo_enabled BOOLEAN DEFAULT 1,              -- 是否启用SEO注入
+  seo_variant TEXT DEFAULT 'default',         -- SEO文案变体: default, minimal, branded
+  seo_custom_text TEXT,                       -- 自定义SEO文案（可选）
+  seo_custom_style TEXT,                      -- 自定义CSS样式（可选）
+  seo_position TEXT DEFAULT 'bottom-right'    -- 位置: bottom-right, bottom-left, bottom-center
+    CHECK (seo_position IN ('bottom-right', 'bottom-left', 'bottom-center')),
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   last_login_at DATETIME,
