@@ -15,86 +15,113 @@
 
 import { Hono } from 'hono';
 import { success, fail } from '../utils/response';
+import { getUsername } from '../middleware/auth';
+import { parsePagination, parseId, parseSort } from '../middleware/validate';
+import { userQueries, mailQueries } from '../utils/db';
+import { getCache, cacheKeys, cacheTtl } from '../utils/cache';
 import type { Env } from '../index';
 
 export const mailRoutes = new Hono<{ Bindings: Env }>();
 
-function getUsername(c: any): string {
-  const payload = c.get('jwtPayload') as { sub: string };
-  return payload.sub;
-}
-
-// GET /api/mails?page=1&limit=20&unread=false
+// GET /api/mails?page=1&limit=20&status=all&search=xxx
 mailRoutes.get('/', async (c) => {
   const username = getUsername(c);
 
-  const user = await c.env.DB.prepare(
-    'SELECT id FROM users WHERE username = ?',
-  )
-    .bind(username)
-    .first<{ id: number }>();
-
+  // 获取用户
+  const user = await userQueries.findByUsername(c.env.DB, username);
   if (!user) {
     return fail(c, 'NOT_FOUND', '用户不存在', 404);
   }
 
-  // 分页参数
-  const page = Math.max(1, parseInt(c.req.query('page') || '1', 10));
-  const limit = Math.min(100, Math.max(1, parseInt(c.req.query('limit') || '20', 10)));
-  const offset = (page - 1) * limit;
-  const unreadOnly = c.req.query('unread') === 'true';
+  // 检查是否已注册邮箱
+  if (!user.has_email) {
+    return fail(c, 'BAD_REQUEST', '尚未注册邮箱', 400);
+  }
 
-  // 查询总数
-  const countSql = unreadOnly
-    ? 'SELECT COUNT(*) as total FROM mails WHERE user_id = ? AND is_read = 0'
-    : 'SELECT COUNT(*) as total FROM mails WHERE user_id = ?';
-  const countResult = await c.env.DB.prepare(countSql)
-    .bind(user.id)
-    .first<{ total: number }>();
-  const total = countResult?.total ?? 0;
+  // 解析参数
+  const { page, limit, offset } = parsePagination(c);
+  const status = c.req.query('status') || 'all';
+  const search = c.req.query('search') || '';
+  const { field: sortBy, order: sortOrder } = parseSort(
+    c,
+    ['received_at', 'size', 'from_address', 'subject'],
+    'received_at',
+    'desc'
+  );
 
-  // 查询列表（不返回 body，节省带宽）
-  const listSql = unreadOnly
-    ? 'SELECT id, from_address, subject, received_at, size, is_read FROM mails WHERE user_id = ? AND is_read = 0 ORDER BY received_at DESC LIMIT ? OFFSET ?'
-    : 'SELECT id, from_address, subject, received_at, size, is_read FROM mails WHERE user_id = ? ORDER BY received_at DESC LIMIT ? OFFSET ?';
-  const { results } = await c.env.DB.prepare(listSql)
-    .bind(user.id, limit, offset)
-    .all();
-
-  return success(c, {
-    mails: results,
-    pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+  // 查询邮件列表
+  const result = await mailQueries.getList(c.env.DB, user.id, {
+    page,
+    limit,
+    offset,
+    status,
+    search,
+    sortBy,
+    sortOrder,
   });
+
+  return success(c, result);
+});
+
+// GET /api/mails/stats
+mailRoutes.get('/stats', async (c) => {
+  const username = getUsername(c);
+
+  const user = await userQueries.findByUsername(c.env.DB, username);
+  if (!user) {
+    return fail(c, 'NOT_FOUND', '用户不存在', 404);
+  }
+
+  // 尝试从缓存获取
+  const cache = getCache(c.env);
+  if (cache) {
+    const cached = await cache.get(cacheKeys.mailStats(user.id));
+    if (cached) {
+      return success(c, cached);
+    }
+  }
+
+  const stats = await mailQueries.getStats(c.env.DB, user.id);
+
+  const result = {
+    total: stats?.total ?? 0,
+    unread: stats?.unread ?? 0,
+    starred: stats?.starred ?? 0,
+    total_size: stats?.total_size ?? 0,
+  };
+
+  // 缓存结果
+  if (cache) {
+    await cache.set(cacheKeys.mailStats(user.id), result, { ttl: cacheTtl.mailStats });
+  }
+
+  return success(c, result);
 });
 
 // GET /api/mails/:id
 mailRoutes.get('/:id', async (c) => {
   const username = getUsername(c);
-  const mailId = parseInt(c.req.param('id'), 10);
+  const mailId = parseId(c);
 
-  if (isNaN(mailId)) {
+  if (!mailId) {
     return fail(c, 'INVALID_INPUT', '邮件 ID 无效', 400);
   }
 
-  // 验证邮件归属
-  const mail = await c.env.DB.prepare(
-    `SELECT m.* FROM mails m
-     JOIN users u ON m.user_id = u.id
-     WHERE m.id = ? AND u.username = ?`,
-  )
-    .bind(mailId, username)
-    .first();
+  const user = await userQueries.findByUsername(c.env.DB, username);
+  if (!user) {
+    return fail(c, 'NOT_FOUND', '用户不存在', 404);
+  }
 
+  // 获取邮件详情
+  const mail = await mailQueries.getDetail(c.env.DB, mailId, user.id);
   if (!mail) {
     return fail(c, 'NOT_FOUND', '邮件不存在', 404);
   }
 
   // 标记为已读
-  await c.env.DB.prepare(
-    'UPDATE mails SET is_read = 1 WHERE id = ?',
-  )
-    .bind(mailId)
-    .run();
+  if (!mail.is_read) {
+    await mailQueries.markRead(c.env.DB, mailId);
+  }
 
   return success(c, mail);
 });
@@ -102,43 +129,33 @@ mailRoutes.get('/:id', async (c) => {
 // DELETE /api/mails/:id
 mailRoutes.delete('/:id', async (c) => {
   const username = getUsername(c);
-  const mailId = parseInt(c.req.param('id'), 10);
+  const mailId = parseId(c);
 
-  if (isNaN(mailId)) {
+  if (!mailId) {
     return fail(c, 'INVALID_INPUT', '邮件 ID 无效', 400);
   }
 
-  // 验证归属并获取大小
-  const mail = await c.env.DB.prepare(
-    `SELECT m.id, m.size FROM mails m
-     JOIN users u ON m.user_id = u.id
-     WHERE m.id = ? AND u.username = ?`,
-  )
-    .bind(mailId, username)
-    .first<{ id: number; size: number }>();
+  const user = await userQueries.findByUsername(c.env.DB, username);
+  if (!user) {
+    return fail(c, 'NOT_FOUND', '用户不存在', 404);
+  }
 
-  if (!mail) {
+  // 删除邮件并获取大小
+  const deletedSize = await mailQueries.deleteWithSize(c.env.DB, mailId, user.id);
+  if (deletedSize === 0) {
     return fail(c, 'NOT_FOUND', '邮件不存在', 404);
   }
 
-  const user = await c.env.DB.prepare(
-    'SELECT id FROM users WHERE username = ?',
-  )
-    .bind(username)
-    .first<{ id: number }>();
-
-  await c.env.DB.batch([
-    c.env.DB.prepare('DELETE FROM mails WHERE id = ?').bind(mailId),
-    c.env.DB.prepare(
-      'UPDATE users SET total_mail_size = MAX(0, total_mail_size - ?) WHERE id = ?',
-    ).bind(mail.size, user!.id),
-  ]);
+  // 清除缓存
+  const cache = getCache(c.env);
+  if (cache) {
+    await cache.delete(cacheKeys.mailStats(user.id));
+  }
 
   return success(c, { message: '邮件已删除' });
 });
 
 // DELETE /api/mails  批量删除
-// Body: { ids: number[] }
 mailRoutes.delete('/', async (c) => {
   const username = getUsername(c);
 
@@ -153,100 +170,43 @@ mailRoutes.delete('/', async (c) => {
     return fail(c, 'INVALID_INPUT', '请提供要删除的邮件 ID 列表', 400);
   }
 
-  const user = await c.env.DB.prepare(
-    'SELECT id FROM users WHERE username = ?',
-  )
-    .bind(username)
-    .first<{ id: number }>();
-
+  const user = await userQueries.findByUsername(c.env.DB, username);
   if (!user) {
     return fail(c, 'NOT_FOUND', '用户不存在', 404);
   }
 
-  // 计算待删除邮件总大小
-  const placeholders = body.ids.map(() => '?').join(',');
-  const { results: mailsToDelete } = await c.env.DB.prepare(
-    `SELECT size FROM mails WHERE id IN (${placeholders}) AND user_id = ?`,
-  )
-    .bind(...body.ids, user.id)
-    .all<{ size: number }>();
+  // 批量删除
+  const deletedCount = await mailQueries.batchDelete(c.env.DB, user.id, body.ids);
 
-  const totalSize = mailsToDelete.reduce((sum, m) => sum + m.size, 0);
-
-  // 执行删除
-  await c.env.DB.prepare(
-    `DELETE FROM mails WHERE id IN (${placeholders}) AND user_id = ?`,
-  )
-    .bind(...body.ids, user.id)
-    .run();
-
-  // 更新用户邮件总大小
-  await c.env.DB.prepare(
-    'UPDATE users SET total_mail_size = MAX(0, total_mail_size - ?) WHERE id = ?',
-  )
-    .bind(totalSize, user.id)
-    .run();
-
-  return success(c, { deleted: mailsToDelete.length });
-});
-
-// GET /api/mails/stats
-mailRoutes.get('/stats', async (c) => {
-  const username = getUsername(c);
-
-  const user = await c.env.DB.prepare(
-    'SELECT id FROM users WHERE username = ?',
-  )
-    .bind(username)
-    .first<{ id: number }>();
-
-  if (!user) {
-    return fail(c, 'NOT_FOUND', '用户不存在', 404);
+  // 清除缓存
+  const cache = getCache(c.env);
+  if (cache) {
+    await cache.delete(cacheKeys.mailStats(user.id));
   }
 
-  const stats = await c.env.DB.prepare(
-    `SELECT
-      COUNT(*) as total,
-      SUM(CASE WHEN is_read = 0 THEN 1 ELSE 0 END) as unread,
-      SUM(CASE WHEN is_starred = 1 THEN 1 ELSE 0 END) as starred,
-      SUM(size) as total_size
-    FROM mails WHERE user_id = ?`,
-  )
-    .bind(user.id)
-    .first<{ total: number; unread: number; starred: number; total_size: number }>();
-
-  return success(c, {
-    total: stats?.total ?? 0,
-    unread: stats?.unread ?? 0,
-    starred: stats?.starred ?? 0,
-    total_size: stats?.total_size ?? 0,
-  });
+  return success(c, { deleted: deletedCount });
 });
 
 // PUT /api/mails/:id/read
 mailRoutes.put('/:id/read', async (c) => {
   const username = getUsername(c);
-  const mailId = parseInt(c.req.param('id'), 10);
+  const mailId = parseId(c);
 
-  if (isNaN(mailId)) {
+  if (!mailId) {
     return fail(c, 'INVALID_INPUT', '邮件 ID 无效', 400);
   }
 
-  const mail = await c.env.DB.prepare(
-    `SELECT m.id FROM mails m
-     JOIN users u ON m.user_id = u.id
-     WHERE m.id = ? AND u.username = ?`,
-  )
-    .bind(mailId, username)
-    .first();
+  const user = await userQueries.findByUsername(c.env.DB, username);
+  if (!user) {
+    return fail(c, 'NOT_FOUND', '用户不存在', 404);
+  }
 
+  const mail = await mailQueries.getDetail(c.env.DB, mailId, user.id);
   if (!mail) {
     return fail(c, 'NOT_FOUND', '邮件不存在', 404);
   }
 
-  await c.env.DB.prepare('UPDATE mails SET is_read = 1 WHERE id = ?')
-    .bind(mailId)
-    .run();
+  await mailQueries.markRead(c.env.DB, mailId);
 
   return success(c, { message: '已标记为已读' });
 });
@@ -254,27 +214,23 @@ mailRoutes.put('/:id/read', async (c) => {
 // PUT /api/mails/:id/unread
 mailRoutes.put('/:id/unread', async (c) => {
   const username = getUsername(c);
-  const mailId = parseInt(c.req.param('id'), 10);
+  const mailId = parseId(c);
 
-  if (isNaN(mailId)) {
+  if (!mailId) {
     return fail(c, 'INVALID_INPUT', '邮件 ID 无效', 400);
   }
 
-  const mail = await c.env.DB.prepare(
-    `SELECT m.id FROM mails m
-     JOIN users u ON m.user_id = u.id
-     WHERE m.id = ? AND u.username = ?`,
-  )
-    .bind(mailId, username)
-    .first();
+  const user = await userQueries.findByUsername(c.env.DB, username);
+  if (!user) {
+    return fail(c, 'NOT_FOUND', '用户不存在', 404);
+  }
 
+  const mail = await mailQueries.getDetail(c.env.DB, mailId, user.id);
   if (!mail) {
     return fail(c, 'NOT_FOUND', '邮件不存在', 404);
   }
 
-  await c.env.DB.prepare('UPDATE mails SET is_read = 0 WHERE id = ?')
-    .bind(mailId)
-    .run();
+  await mailQueries.markUnread(c.env.DB, mailId);
 
   return success(c, { message: '已标记为未读' });
 });
@@ -282,30 +238,25 @@ mailRoutes.put('/:id/unread', async (c) => {
 // PUT /api/mails/:id/star
 mailRoutes.put('/:id/star', async (c) => {
   const username = getUsername(c);
-  const mailId = parseInt(c.req.param('id'), 10);
+  const mailId = parseId(c);
 
-  if (isNaN(mailId)) {
+  if (!mailId) {
     return fail(c, 'INVALID_INPUT', '邮件 ID 无效', 400);
   }
 
-  const mail = await c.env.DB.prepare(
-    `SELECT m.id, m.is_starred FROM mails m
-     JOIN users u ON m.user_id = u.id
-     WHERE m.id = ? AND u.username = ?`,
-  )
-    .bind(mailId, username)
-    .first<{ id: number; is_starred: number }>();
+  const user = await userQueries.findByUsername(c.env.DB, username);
+  if (!user) {
+    return fail(c, 'NOT_FOUND', '用户不存在', 404);
+  }
 
+  const mail = await mailQueries.getDetail(c.env.DB, mailId, user.id);
   if (!mail) {
     return fail(c, 'NOT_FOUND', '邮件不存在', 404);
   }
 
-  const newStarred = mail.is_starred ? 0 : 1;
-  await c.env.DB.prepare('UPDATE mails SET is_starred = ? WHERE id = ?')
-    .bind(newStarred, mailId)
-    .run();
+  const isStarred = await mailQueries.toggleStar(c.env.DB, mailId);
 
-  return success(c, { is_starred: newStarred === 1 });
+  return success(c, { is_starred: isStarred });
 });
 
 // PUT /api/mails/read  批量标记已读
@@ -323,22 +274,12 @@ mailRoutes.put('/read', async (c) => {
     return fail(c, 'INVALID_INPUT', '请提供邮件 ID 列表', 400);
   }
 
-  const user = await c.env.DB.prepare(
-    'SELECT id FROM users WHERE username = ?',
-  )
-    .bind(username)
-    .first<{ id: number }>();
-
+  const user = await userQueries.findByUsername(c.env.DB, username);
   if (!user) {
     return fail(c, 'NOT_FOUND', '用户不存在', 404);
   }
 
-  const placeholders = body.ids.map(() => '?').join(',');
-  await c.env.DB.prepare(
-    `UPDATE mails SET is_read = 1 WHERE id IN (${placeholders}) AND user_id = ?`,
-  )
-    .bind(...body.ids, user.id)
-    .run();
+  await mailQueries.batchUpdateStatus(c.env.DB, user.id, body.ids, 'is_read', 1);
 
   return success(c, { message: '已批量标记为已读' });
 });
@@ -358,22 +299,12 @@ mailRoutes.put('/unread', async (c) => {
     return fail(c, 'INVALID_INPUT', '请提供邮件 ID 列表', 400);
   }
 
-  const user = await c.env.DB.prepare(
-    'SELECT id FROM users WHERE username = ?',
-  )
-    .bind(username)
-    .first<{ id: number }>();
-
+  const user = await userQueries.findByUsername(c.env.DB, username);
   if (!user) {
     return fail(c, 'NOT_FOUND', '用户不存在', 404);
   }
 
-  const placeholders = body.ids.map(() => '?').join(',');
-  await c.env.DB.prepare(
-    `UPDATE mails SET is_read = 0 WHERE id IN (${placeholders}) AND user_id = ?`,
-  )
-    .bind(...body.ids, user.id)
-    .run();
+  await mailQueries.batchUpdateStatus(c.env.DB, user.id, body.ids, 'is_read', 0);
 
   return success(c, { message: '已批量标记为未读' });
 });
@@ -389,12 +320,7 @@ mailRoutes.post('/register', async (c) => {
     body = {};
   }
 
-  const user = await c.env.DB.prepare(
-    'SELECT id, has_email FROM users WHERE username = ?',
-  )
-    .bind(username)
-    .first<{ id: number; has_email: number }>();
-
+  const user = await userQueries.findByUsername(c.env.DB, username);
   if (!user) {
     return fail(c, 'NOT_FOUND', '用户不存在', 404);
   }
@@ -403,15 +329,23 @@ mailRoutes.post('/register', async (c) => {
     return fail(c, 'CONFLICT', '邮箱已注册', 409);
   }
 
-  await c.env.DB.prepare(
-    'UPDATE users SET has_email = 1, forward_email = ?, email_enabled = 1 WHERE id = ?',
-  )
-    .bind(body.forwardEmail || null, user.id)
-    .run();
+  // 验证转发邮箱格式
+  if (body.forwardEmail) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(body.forwardEmail)) {
+      return fail(c, 'INVALID_INPUT', '转发邮箱格式无效', 400);
+    }
+  }
+
+  await userQueries.update(c.env.DB, user.id, {
+    has_email: 1,
+    forward_email: body.forwardEmail || null,
+    email_enabled: 1,
+  });
 
   return success(c, {
     email: `${username}@nomio.world`,
     forwardEmail: body.forwardEmail || null,
     emailEnabled: true,
-  });
+  }, 201);
 });

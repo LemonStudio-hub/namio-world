@@ -15,6 +15,8 @@ export interface Env {
   DB: D1Database;
   JWT_SECRET: string;
   ALLOWED_ORIGINS: string;
+  RATE_LIMIT_KV?: KVNamespace;
+  CACHE_KV?: KVNamespace;
 }
 
 const app = new Hono<{ Bindings: Env }>();
@@ -29,8 +31,32 @@ app.use('/api/*', async (c, next) => {
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
+    maxAge: 86400,
   });
   return corsMiddleware(c, next);
+});
+
+// 安全头
+app.use('/api/*', async (c, next) => {
+  await next();
+  c.header('X-Content-Type-Options', 'nosniff');
+  c.header('X-Frame-Options', 'DENY');
+  c.header('X-XSS-Protection', '1; mode=block');
+  c.header('Referrer-Policy', 'strict-origin-when-cross-origin');
+});
+
+// 请求日志
+app.use('/api/*', async (c, next) => {
+  const start = Date.now();
+  const method = c.req.method;
+  const path = c.req.path;
+
+  await next();
+
+  const duration = Date.now() - start;
+  const status = c.res.status;
+
+  console.log(`[${method}] ${path} ${status} ${duration}ms`);
 });
 
 // ---- 公开路由（无需认证） ----
@@ -41,7 +67,16 @@ app.use('/api/domains/*', async (c, next) => {
   const jwtMiddleware = jwt({ secret: c.env.JWT_SECRET });
   return jwtMiddleware(c, next);
 });
+app.use('/api/domains', async (c, next) => {
+  // 允许 POST /api/domains/register 和 GET /api/domains
+  const jwtMiddleware = jwt({ secret: c.env.JWT_SECRET });
+  return jwtMiddleware(c, next);
+});
 app.use('/api/mails/*', async (c, next) => {
+  const jwtMiddleware = jwt({ secret: c.env.JWT_SECRET });
+  return jwtMiddleware(c, next);
+});
+app.use('/api/mails', async (c, next) => {
   const jwtMiddleware = jwt({ secret: c.env.JWT_SECRET });
   return jwtMiddleware(c, next);
 });
@@ -55,11 +90,33 @@ app.route('/api/domains', domainRoutes);
 app.route('/api/mails', mailRoutes);
 app.route('/api/settings', settingsRoutes);
 
+// ---- 健康检查 ----
+app.get('/api/health', (c) => {
+  return c.json({
+    success: true,
+    data: {
+      status: 'healthy',
+      version: '1.0.0',
+      timestamp: new Date().toISOString(),
+    },
+  });
+});
+
 // ---- 错误处理 ----
 app.onError((err, c) => {
   console.error('[API Error]', err);
+
+  // 生产环境不暴露错误详情
+  const isProduction = c.env.ALLOWED_ORIGINS !== '*';
+
   return c.json(
-    { success: false, error: { code: 'INTERNAL_ERROR', message: '服务器内部错误' } },
+    {
+      success: false,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: isProduction ? '服务器内部错误' : err.message,
+      },
+    },
     500,
   );
 });

@@ -190,6 +190,8 @@ export const TEST_USER = {
   password_hash: '', // 运行时填充
   origin_url: 'https://alice.example.com',
   origin_host: 'alice.example.com',
+  has_domain: 1,
+  has_email: 1,
   forward_email: null,
   email_enabled: 1,
   status: 'active',
@@ -206,11 +208,14 @@ export const TEST_MAIL = {
   user_id: 1,
   message_id: 'msg-001',
   from_address: 'bob@example.com',
+  to_address: 'alice@nomio.world',
   subject: 'Test Email',
   body: 'Hello, this is a test email.',
+  html_body: '<p>Hello, this is a test email.</p>',
   received_at: '2026-01-15T10:00:00.000Z',
   size: 30,
   is_read: 0,
+  is_starred: 0,
 };
 
 // ---- Hono 请求构造 ----

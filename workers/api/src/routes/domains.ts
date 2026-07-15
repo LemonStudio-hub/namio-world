@@ -10,28 +10,39 @@
 import { Hono } from 'hono';
 import { validateOriginUrl } from '../utils/validator';
 import { success, fail } from '../utils/response';
+import { getUsername } from '../middleware/auth';
+import { userQueries } from '../utils/db';
+import { getCache, cacheKeys, cacheTtl } from '../utils/cache';
 import type { Env } from '../index';
 
 export const domainRoutes = new Hono<{ Bindings: Env }>();
 
-// 从 JWT payload 获取用户名
-function getUsername(c: any): string {
-  const payload = c.get('jwtPayload') as { sub: string };
-  return payload.sub;
-}
-
 // GET /api/domains
 domainRoutes.get('/', async (c) => {
   const username = getUsername(c);
+  const cache = getCache(c.env);
+
+  // 尝试从缓存获取
+  if (cache) {
+    const cached = await cache.get(cacheKeys.domain(username));
+    if (cached) {
+      return success(c, cached);
+    }
+  }
 
   const user = await c.env.DB.prepare(
-    'SELECT username, origin_url, origin_host, verify_status, created_at FROM users WHERE username = ?',
+    'SELECT username, origin_url, origin_host, verify_status, has_domain, created_at FROM users WHERE username = ?'
   )
     .bind(username)
     .first();
 
   if (!user) {
     return fail(c, 'NOT_FOUND', '用户不存在', 404);
+  }
+
+  // 缓存结果
+  if (cache && user.has_domain) {
+    await cache.set(cacheKeys.domain(username), user, { ttl: cacheTtl.domain });
   }
 
   return success(c, user);
@@ -58,16 +69,13 @@ domainRoutes.post('/register', async (c) => {
     return fail(c, 'INVALID_INPUT', originCheck.error!, 400);
   }
 
-  const user = await c.env.DB.prepare(
-    'SELECT id, has_domain FROM users WHERE username = ?',
-  )
-    .bind(username)
-    .first<{ id: number; has_domain: number }>();
-
+  // 获取用户信息
+  const user = await userQueries.findByUsername(c.env.DB, username);
   if (!user) {
     return fail(c, 'NOT_FOUND', '用户不存在', 404);
   }
 
+  // 检查是否已注册域名
   if (user.has_domain) {
     return fail(c, 'CONFLICT', '域名已注册', 409);
   }
@@ -76,18 +84,27 @@ domainRoutes.post('/register', async (c) => {
   const host = originHost || hostname;
   const verifyToken = crypto.randomUUID().replace(/-/g, '').substring(0, 32);
 
-  await c.env.DB.prepare(
-    'UPDATE users SET origin_url = ?, origin_host = ?, has_domain = 1, verify_token = ?, verify_status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-  )
-    .bind(originUrl, host, verifyToken, 'pending', user.id)
-    .run();
+  // 更新用户域名信息
+  await userQueries.update(c.env.DB, user.id, {
+    origin_url: originUrl,
+    origin_host: host,
+    has_domain: 1,
+    verify_token: verifyToken,
+    verify_status: 'pending',
+  });
+
+  // 清除缓存
+  const cache = getCache(c.env);
+  if (cache) {
+    await cache.delete(cacheKeys.domain(username));
+  }
 
   return success(c, {
     originUrl,
     originHost: host,
     verifyToken,
     verifyStatus: 'pending',
-  });
+  }, 201);
 });
 
 // PUT /api/domains
@@ -141,14 +158,14 @@ domainRoutes.delete('/', async (c) => {
 domainRoutes.post('/verify', async (c) => {
   const username = getUsername(c);
 
-  const user = await c.env.DB.prepare(
-    'SELECT id, origin_url, verify_token FROM users WHERE username = ?',
-  )
-    .bind(username)
-    .first<{ id: number; origin_url: string; verify_token: string }>();
-
+  // 获取用户信息
+  const user = await userQueries.findByUsername(c.env.DB, username);
   if (!user) {
     return fail(c, 'NOT_FOUND', '用户不存在', 404);
+  }
+
+  if (!user.has_domain) {
+    return fail(c, 'BAD_REQUEST', '尚未注册域名', 400);
   }
 
   // 发起验证请求
@@ -158,14 +175,13 @@ domainRoutes.post('/verify', async (c) => {
     const resp = await fetch(verifyUrl, {
       method: 'GET',
       signal: AbortSignal.timeout(10_000),
+      headers: {
+        'User-Agent': 'Nomio-Verify/1.0',
+      },
     });
 
     if (!resp.ok) {
-      await c.env.DB.prepare(
-        'UPDATE users SET verify_status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-      )
-        .bind('failed', user.id)
-        .run();
+      await userQueries.update(c.env.DB, user.id, { verify_status: 'failed' });
       return fail(c, 'VERIFY_FAILED', `验证文件不可访问（HTTP ${resp.status}）`, 400);
     }
 
@@ -173,26 +189,21 @@ domainRoutes.post('/verify', async (c) => {
     const expected = `nomio-verify=${user.verify_token}`;
 
     if (content.trim() === expected) {
-      await c.env.DB.prepare(
-        'UPDATE users SET verify_status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-      )
-        .bind('verified', user.id)
-        .run();
+      await userQueries.update(c.env.DB, user.id, { verify_status: 'verified' });
+
+      // 清除缓存
+      const cache = getCache(c.env);
+      if (cache) {
+        await cache.delete(cacheKeys.domain(username));
+      }
+
       return success(c, { verifyStatus: 'verified' });
     } else {
-      await c.env.DB.prepare(
-        'UPDATE users SET verify_status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-      )
-        .bind('failed', user.id)
-        .run();
+      await userQueries.update(c.env.DB, user.id, { verify_status: 'failed' });
       return fail(c, 'VERIFY_FAILED', '验证文件内容不匹配', 400);
     }
   } catch (err) {
-    await c.env.DB.prepare(
-      'UPDATE users SET verify_status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-    )
-      .bind('failed', user.id)
-      .run();
+    await userQueries.update(c.env.DB, user.id, { verify_status: 'failed' });
     return fail(c, 'VERIFY_FAILED', '无法连接到源站', 400);
   }
 });

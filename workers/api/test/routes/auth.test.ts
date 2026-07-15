@@ -36,24 +36,26 @@ describe('POST /api/auth/register', () => {
   it('成功注册新用户', async () => {
     const res = await req(app, createRequest('/api/auth/register', {
       method: 'POST',
-      body: jsonBody({ username: 'alice', password: 'password123', originUrl: 'https://alice.example.com' }),
+      body: jsonBody({ username: 'alice', password: 'password123' }),
     }), db);
     expect(res.status).toBe(201);
     const body = await res.json() as any;
     expect(body.success).toBe(true);
     expect(body.data.token).toBeTruthy();
     expect(body.data.user.username).toBe('alice');
+    expect(body.data.user.hasDomain).toBe(false);
+    expect(body.data.user.hasEmail).toBe(false);
   });
 
   it('拒绝重复用户名', async () => {
     await req(app, createRequest('/api/auth/register', {
       method: 'POST',
-      body: jsonBody({ username: 'alice', password: 'password123', originUrl: 'https://alice.example.com' }),
+      body: jsonBody({ username: 'alice', password: 'password123' }),
     }), db);
 
     const res = await req(app, createRequest('/api/auth/register', {
       method: 'POST',
-      body: jsonBody({ username: 'alice', password: 'password456', originUrl: 'https://alice2.example.com' }),
+      body: jsonBody({ username: 'alice', password: 'password456' }),
     }), db);
     expect(res.status).toBe(409);
     const body = await res.json() as any;
@@ -63,9 +65,9 @@ describe('POST /api/auth/register', () => {
   it('大写用户名被自动转为小写后接受', async () => {
     const res = await req(app, createRequest('/api/auth/register', {
       method: 'POST',
-      body: jsonBody({ username: 'Alice', password: 'password123', originUrl: 'https://alice.example.com' }),
+      body: jsonBody({ username: 'Alice', password: 'password123' }),
     }), db);
-    // 路路由会先 toLowerCase()，'Alice' → 'alice' 是合法的
+    // 路由会先 toLowerCase()，'Alice' → 'alice' 是合法的
     expect(res.status).toBe(201);
     const body = await res.json() as any;
     expect(body.data.user.username).toBe('alice');
@@ -74,27 +76,17 @@ describe('POST /api/auth/register', () => {
   it('拒绝保留词用户名', async () => {
     const res = await req(app, createRequest('/api/auth/register', {
       method: 'POST',
-      body: jsonBody({ username: 'admin', password: 'password123', originUrl: 'https://admin.example.com' }),
+      body: jsonBody({ username: 'admin', password: 'password123' }),
     }), db);
     expect(res.status).toBe(400);
     const body = await res.json() as any;
     expect(body.error.message).toContain('保留');
   });
 
-  it('拒绝 HTTP 源站', async () => {
-    const res = await req(app, createRequest('/api/auth/register', {
-      method: 'POST',
-      body: jsonBody({ username: 'alice', password: 'password123', originUrl: 'http://alice.example.com' }),
-    }), db);
-    expect(res.status).toBe(400);
-    const body = await res.json() as any;
-    expect(body.error.message).toContain('HTTPS');
-  });
-
   it('拒绝短密码', async () => {
     const res = await req(app, createRequest('/api/auth/register', {
       method: 'POST',
-      body: jsonBody({ username: 'alice', password: '1234567', originUrl: 'https://alice.example.com' }),
+      body: jsonBody({ username: 'alice', password: '1234567' }),
     }), db);
     expect(res.status).toBe(400);
     const body = await res.json() as any;
@@ -115,16 +107,6 @@ describe('POST /api/auth/register', () => {
       body: 'not json',
     }), db);
     expect(res.status).toBe(400);
-  });
-
-  it('拒绝 IP 地址源站', async () => {
-    const res = await req(app, createRequest('/api/auth/register', {
-      method: 'POST',
-      body: jsonBody({ username: 'alice', password: 'password123', originUrl: 'https://192.168.1.1' }),
-    }), db);
-    expect(res.status).toBe(400);
-    const body = await res.json() as any;
-    expect(body.error.message).toContain('IP');
   });
 });
 
