@@ -56,6 +56,7 @@ install_deps() {
   cd "$ROOT/workers/api" && npm install --silent
   cd "$ROOT/workers/gateway" && npm install --silent
   cd "$ROOT/workers/email" && npm install --silent
+  cd "$ROOT/workers/email-handler" && npm install --silent
   cd "$ROOT/dashboard" && npm install --silent
   cd "$ROOT"
   ok "依赖安装完成"
@@ -115,6 +116,31 @@ setup_jwt_secret() {
 }
 
 # ============================================================
+# 设置 Cloudflare Queue
+# ============================================================
+setup_queues() {
+  info "设置 Cloudflare Queue..."
+
+  # 创建主队列
+  if wrangler queues list 2>/dev/null | grep -q "nomio-email-queue"; then
+    warn "队列 nomio-email-queue 已存在，跳过创建"
+  else
+    wrangler queues create nomio-email-queue
+    ok "创建队列: nomio-email-queue"
+  fi
+
+  # 创建死信队列
+  if wrangler queues list 2>/dev/null | grep -q "nomio-email-dlq"; then
+    warn "队列 nomio-email-dlq 已存在，跳过创建"
+  else
+    wrangler queues create nomio-email-dlq
+    ok "创建队列: nomio-email-dlq"
+  fi
+
+  ok "Queue 设置完成"
+}
+
+# ============================================================
 # 部署 Workers
 # ============================================================
 deploy_api() {
@@ -136,11 +162,17 @@ deploy_gateway() {
 }
 
 deploy_email() {
-  info "部署 Email Worker..."
+  info "部署 Email Handler (Producer)..."
+  cd "$ROOT/workers/email-handler"
+  npm install --silent
+  wrangler deploy
+  ok "Email Handler 部署完成"
+
+  info "部署 Email Consumer..."
   cd "$ROOT/workers/email"
   npm install --silent
   wrangler deploy
-  ok "Email Worker 部署完成"
+  ok "Email Consumer 部署完成"
   cd "$ROOT"
 }
 
@@ -229,11 +261,21 @@ post_deploy_check() {
   info "  部署完成！"
   info "=========================================="
   echo ""
+  info "Workers 部署状态："
+  info "  - API Worker: nomio-api"
+  info "  - Gateway Worker: nomio-gateway"
+  info "  - Email Handler (Producer): nomio-email-handler"
+  info "  - Email Consumer: nomio-email"
+  echo ""
+  info "Queue 配置："
+  info "  - 主队列: nomio-email-queue"
+  info "  - 死信队列: nomio-email-dlq"
+  echo ""
   info "接下来需要手动完成："
   info "  1. 在 Cloudflare Dashboard 配置 DNS:"
   info "     - A 记录: *.nomio.world → Cloudflare (橙色云)"
   info "     - MX 记录: nomio.world → route.mx.cloudflare.net"
-  info "  2. 在 Email Routing 中配置 Catch-all → Email Worker"
+  info "  2. 在 Email Routing 中配置 Catch-all → Email Handler Worker"
   info "  3. 访问 https://nomio-dashboard.pages.dev 查看前端"
   echo ""
 }
@@ -258,6 +300,7 @@ main() {
       run_tests
       setup_jwt_secret
       create_database
+      setup_queues
       deploy_api
       deploy_gateway
       deploy_email

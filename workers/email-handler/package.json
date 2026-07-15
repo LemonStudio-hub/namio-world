@@ -1,17 +1,17 @@
 {
-  "name": "nomio-email",
+  "name": "nomio-email-handler",
   "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "postal-mime": "^2.2.0"
   },
   "devDependencies": {
-    "@cloudflare/vitest-pool-workers": "^0.1.0",
+    "@cloudflare/vitest-pool-workers": "^0.4.0",
     "@cloudflare/workers-types": "^4.20240117.0",
     "typescript": "^5.3.0",
     "vitest": "^1.2.0",

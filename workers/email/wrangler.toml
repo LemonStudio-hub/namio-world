@@ -1,5 +1,7 @@
+# Email Queue Consumer
+# 从队列中消费邮件并写入D1
 name = "nomio-email"
-main = "src/index.ts"
+main = "src/consumer.ts"
 compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
 
@@ -7,6 +9,13 @@ compatibility_flags = ["nodejs_compat"]
 binding = "DB"
 database_name = "nomio-db"
 database_id = "f0616555-1157-4062-b9ef-f27d56831d02"
+
+[[queues.consumers]]
+queue = "nomio-email-queue"
+max_batch_size = 10
+max_batch_timeout = 5
+max_retries = 3
+dead_letter_queue = "nomio-email-dlq"
 
 [vars]
 MAX_MAIL_SIZE = "5242880"

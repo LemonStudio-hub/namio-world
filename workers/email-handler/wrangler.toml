@@ -1,0 +1,17 @@
+# Email Handler (Producer)
+# 接收入站邮件并推送到Queue
+name = "nomio-email-handler"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "nomio-db"
+database_id = "f0616555-1157-4062-b9ef-f27d56831d02"
+
+[[queues.producers]]
+queue = "nomio-email-queue"
+
+[vars]
+MAX_MAIL_SIZE = "5242880"

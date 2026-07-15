@@ -1,0 +1,15 @@
+# Queue配置
+# 需要先运行此命令创建Queue：
+# wrangler queues create nomio-email-queue
+# wrangler queues create nomio-email-dlq
+
+# 主队列
+[[queues.producers]]
+queue = "nomio-email-queue"
+
+# 死信队列（处理失败的消息）
+[[queues.consumers]]
+queue = "nomio-email-dlq"
+max_batch_size = 10
+max_batch_timeout = 5
+max_retries = 3
