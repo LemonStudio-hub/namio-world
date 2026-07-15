@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { getMails, getMail, deleteMail, deleteMails, registerEmail, markAsRead, markAsUnread, toggleStar, markMultipleAsRead, markMultipleAsUnread } from '@/api/mails';
 import { getEmailSettings, updateEmailSettings } from '@/api/settings';

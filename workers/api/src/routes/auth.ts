@@ -165,3 +165,104 @@ authRoutes.get('/me', async (c, next) => {
 
   return success(c, user);
 });
+
+// PUT /api/auth/password — 修改密码（需 JWT）
+authRoutes.put('/password', async (c, next) => {
+  const jwtMiddleware = jwt({ secret: c.env.JWT_SECRET, alg: 'HS256' });
+  return jwtMiddleware(c, next);
+}, async (c) => {
+  const payload = c.get('jwtPayload') as { sub: string };
+
+  let body: { currentPassword?: string; newPassword?: string };
+  try {
+    body = await c.req.json();
+  } catch {
+    return fail(c, 'INVALID_JSON', '请求体格式无效', 400);
+  }
+
+  const { currentPassword, newPassword } = body;
+
+  if (!currentPassword || !newPassword) {
+    return fail(c, 'INVALID_INPUT', '当前密码和新密码均为必填', 400);
+  }
+
+  if (newPassword.length < 8 || newPassword.length > 128) {
+    return fail(c, 'INVALID_INPUT', '新密码长度须为 8-128 个字符', 400);
+  }
+
+  // 查找用户
+  const user = await c.env.DB.prepare(
+    'SELECT id, password_hash FROM users WHERE username = ?'
+  )
+    .bind(payload.sub)
+    .first<{ id: number; password_hash: string }>();
+
+  if (!user) {
+    return fail(c, 'NOT_FOUND', '用户不存在', 404);
+  }
+
+  // 验证当前密码
+  const valid = await verifyPassword(currentPassword, user.password_hash);
+  if (!valid) {
+    return fail(c, 'UNAUTHORIZED', '当前密码错误', 401);
+  }
+
+  // 哈希新密码
+  const newPasswordHash = await hashPassword(newPassword);
+
+  // 更新密码
+  await c.env.DB.prepare(
+    'UPDATE users SET password_hash = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
+  )
+    .bind(newPasswordHash, user.id)
+    .run();
+
+  return success(c, { message: '密码修改成功' });
+});
+
+// DELETE /api/auth/account — 删除账号（需 JWT）
+authRoutes.delete('/account', async (c, next) => {
+  const jwtMiddleware = jwt({ secret: c.env.JWT_SECRET, alg: 'HS256' });
+  return jwtMiddleware(c, next);
+}, async (c) => {
+  const payload = c.get('jwtPayload') as { sub: string };
+
+  let body: { password?: string };
+  try {
+    body = await c.req.json();
+  } catch {
+    return fail(c, 'INVALID_JSON', '请求体格式无效', 400);
+  }
+
+  const { password } = body;
+
+  if (!password) {
+    return fail(c, 'INVALID_INPUT', '密码为必填', 400);
+  }
+
+  // 查找用户
+  const user = await c.env.DB.prepare(
+    'SELECT id, password_hash FROM users WHERE username = ?'
+  )
+    .bind(payload.sub)
+    .first<{ id: number; password_hash: string }>();
+
+  if (!user) {
+    return fail(c, 'NOT_FOUND', '用户不存在', 404);
+  }
+
+  // 验证密码
+  const valid = await verifyPassword(password, user.password_hash);
+  if (!valid) {
+    return fail(c, 'UNAUTHORIZED', '密码错误', 401);
+  }
+
+  // 软删除用户（级联删除会自动删除邮件）
+  await c.env.DB.prepare(
+    "UPDATE users SET status = 'deleted', updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+  )
+    .bind(user.id)
+    .run();
+
+  return success(c, { message: '账号已删除' });
+});

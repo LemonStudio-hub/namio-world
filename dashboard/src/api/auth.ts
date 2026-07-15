@@ -59,3 +59,17 @@ export async function logout() {
 export async function getMe() {
   return request<UserProfile>('/auth/me');
 }
+
+export async function changePassword(currentPassword: string, newPassword: string) {
+  return request('/auth/password', {
+    method: 'PUT',
+    body: { currentPassword, newPassword },
+  });
+}
+
+export async function deleteAccount(password: string) {
+  return request('/auth/account', {
+    method: 'DELETE',
+    body: { password },
+  });
+}

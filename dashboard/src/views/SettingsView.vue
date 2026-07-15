@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useAuthStore } from '@/stores/auth';
-import { getMe } from '@/api/auth';
+import { getMe, changePassword, deleteAccount } from '@/api/auth';
 import { formatBytes, formatFullDate } from '@/utils/format';
 import type { UserProfile } from '@/api/auth';
 
@@ -53,7 +53,7 @@ async function handleChangePassword() {
 
   saving.value = true;
   try {
-    // TODO: 调用修改密码 API
+    await changePassword(currentPassword.value, newPassword.value);
     success.value = '密码修改成功';
     currentPassword.value = '';
     newPassword.value = '';
@@ -65,10 +65,20 @@ async function handleChangePassword() {
   }
 }
 
-function handleDeleteAccount() {
-  if (confirm('确定要删除账号吗？此操作不可撤销，所有数据将被永久删除。')) {
-    // TODO: 调用删除账号 API
+async function handleDeleteAccount() {
+  const password = prompt('请输入密码以确认删除账号：');
+  if (!password) return;
+
+  if (!confirm('确定要删除账号吗？此操作不可撤销，所有数据将被永久删除。')) {
+    return;
+  }
+
+  try {
+    await deleteAccount(password);
+    alert('账号已删除');
     auth.logout();
+  } catch (e: any) {
+    alert(e?.data?.error?.message || '删除失败');
   }
 }
 </script>

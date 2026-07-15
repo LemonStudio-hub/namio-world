@@ -180,7 +180,6 @@ export default {
     from: '发件人',
     to: '收件人',
     date: '时间',
-    size: '大小',
     attachments: '附件',
     attachment: '个附件',
     backToList: '返回列表',

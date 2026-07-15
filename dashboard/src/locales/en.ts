@@ -180,7 +180,6 @@ export default {
     from: 'From',
     to: 'To',
     date: 'Date',
-    size: 'Size',
     attachments: 'Attachments',
     attachment: 'attachments',
     backToList: 'Back to List',
