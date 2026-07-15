@@ -1,22 +1,22 @@
 ---
 layout: home
-title: Namio.World - 开源公益数字身份服务
+title: Nomio.World - 开源公益数字身份服务
 titleTemplate: 免费域名和邮箱
 
 hero:
-  name: Namio.World
+  name: Nomio.World
   text: 开源公益数字身份服务
   tagline: 免费获得 your-name.nomio.world 二级域名和 your-name@nomio.world 邮箱地址
   image:
     src: /hero.svg
-    alt: Namio.World
+    alt: Nomio.World
   actions:
     - theme: brand
       text: 快速开始
       link: /guide/getting-started
     - theme: alt
       text: 在 GitHub 上查看
-      link: https://github.com/LemonStudio-hub/namio-world
+      link: https://github.com/LemonStudio-hub/nomio-world
 
 features:
   - icon: 🌐

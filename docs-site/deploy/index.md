@@ -1,10 +1,10 @@
 # 部署概览
 
-本章介绍如何自部署 Namio.World。
+本章介绍如何自部署 Nomio.World。
 
 ## 架构说明
 
-Namio.World 由以下组件组成：
+Nomio.World 由以下组件组成：
 
 | 组件 | 说明 | 部署方式 |
 |------|------|----------|
@@ -35,8 +35,8 @@ Namio.World 由以下组件组成：
 ### 1. 克隆仓库
 
 ```bash
-git clone https://github.com/LemonStudio-hub/namio-world.git
-cd namio-world
+git clone https://github.com/LemonStudio-hub/nomio-world.git
+cd nomio-world
 ```
 
 ### 2. 安装依赖

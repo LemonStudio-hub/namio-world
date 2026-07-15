@@ -97,7 +97,7 @@ Usually no delay, forward immediately after receiving email.
 
 ### Will forwarding lose emails?
 
-No. Forwarding is performed on the basis of receiving emails, original emails are still saved in Namio.World.
+No. Forwarding is performed on the basis of receiving emails, original emails are still saved in Nomio.World.
 
 ### Can forward to multiple emails?
 
@@ -109,7 +109,7 @@ Yes, you can modify the forwarding email address at any time.
 
 ### After stopping forwarding, are previous emails still there?
 
-Yes, stopping forwarding only affects newly received emails, previously received emails are still saved in Namio.World.
+Yes, stopping forwarding only affects newly received emails, previously received emails are still saved in Nomio.World.
 
 ## Next Steps
 

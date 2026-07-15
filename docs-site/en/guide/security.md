@@ -1,6 +1,6 @@
 # Security Settings
 
-This chapter introduces Namio.World's security mechanisms.
+This chapter introduces Nomio.World's security mechanisms.
 
 ## Security Features
 

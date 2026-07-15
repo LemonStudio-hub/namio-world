@@ -94,7 +94,7 @@ Please check [Deployment Guide](/en/deploy/) to learn how to self-deploy.
 
 ### What are the costs?
 
-Namio.World is completely free for individual users. Self-deployment requires a Cloudflare account.
+Nomio.World is completely free for individual users. Self-deployment requires a Cloudflare account.
 
 ### What regions are supported?
 

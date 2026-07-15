@@ -1,10 +1,10 @@
 # 快速开始
 
-只需三步即可开始使用 Namio.World。
+只需三步即可开始使用 Nomio.World。
 
 ## 第一步：注册账号
 
-1. 访问 [Namio.World](https://nomio-dashboard.pages.dev)
+1. 访问 [Nomio.World](https://nomio-dashboard.pages.dev)
 2. 点击"免费注册"按钮
 3. 填写注册信息：
    - **用户名** - 将作为你的二级域名前缀（如 `alice`）

@@ -44,14 +44,14 @@ const techs = [
   <div class="about" :class="{ visible }">
     <div class="page-header">
       <h1>关于</h1>
-      <p>Namio.World 项目介绍与技术架构</p>
+      <p>Nomio.World 项目介绍与技术架构</p>
     </div>
 
     <!-- 项目简介 -->
     <div class="card reveal">
       <div class="card-title">项目简介</div>
       <p style="font-size: 0.875rem; color: var(--color-text-secondary); line-height: 1.8">
-        Namio.World 是一个基于 Cloudflare 边缘计算平台的公益数字身份基建服务。
+        Nomio.World 是一个基于 Cloudflare 边缘计算平台的公益数字身份基建服务。
         名称取自 <strong>Name + I/O</strong>，寓意"域名与邮箱的入口服务"。
         项目采用 AGPL-3.0 开源协议，所有代码完全公开透明。
       </p>

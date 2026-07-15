@@ -1,10 +1,10 @@
 # Introduction
 
-Welcome to Namio.World! This is an open source public digital identity service that provides free subdomains and email addresses.
+Welcome to Nomio.World! This is an open source public digital identity service that provides free subdomains and email addresses.
 
-## What is Namio.World?
+## What is Nomio.World?
 
-Namio.World is a public welfare digital identity infrastructure service based on the Cloudflare edge computing platform. The name comes from **Name + I/O**, meaning "entry service for domains and emails".
+Nomio.World is a public welfare digital identity infrastructure service based on the Cloudflare edge computing platform. The name comes from **Name + I/O**, meaning "entry service for domains and emails".
 
 ### Core Features
 
@@ -16,7 +16,7 @@ Namio.World is a public welfare digital identity infrastructure service based on
 
 ### Technical Architecture
 
-Namio.World is built with modern technology stack:
+Nomio.World is built with modern technology stack:
 
 | Component | Technology | Description |
 |-----------|------------|-------------|

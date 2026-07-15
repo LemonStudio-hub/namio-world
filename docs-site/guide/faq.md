@@ -94,7 +94,7 @@
 
 ### 需要什么费用？
 
-Namio.World 对个人用户完全免费。自部署需要 Cloudflare 账户。
+Nomio.World 对个人用户完全免费。自部署需要 Cloudflare 账户。
 
 ### 支持哪些地区？
 

@@ -1,6 +1,6 @@
 # Contributing Guide
 
-Thank you for your interest in the Namio.World project! We welcome any form of contribution.
+Thank you for your interest in the Nomio.World project! We welcome any form of contribution.
 
 ## How to Contribute
 
@@ -63,8 +63,8 @@ Types include:
 #### Clone Project
 
 ```bash
-git clone https://github.com/LemonStudio-hub/namio-world.git
-cd namio-world
+git clone https://github.com/LemonStudio-hub/nomio-world.git
+cd nomio-world
 ```
 
 #### Install Dependencies

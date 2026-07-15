@@ -1,10 +1,10 @@
 # Deployment Overview
 
-This chapter introduces how to self-deploy Namio.World.
+This chapter introduces how to self-deploy Nomio.World.
 
 ## Architecture
 
-Namio.World consists of the following components:
+Nomio.World consists of the following components:
 
 | Component | Description | Deployment |
 |-----------|-------------|------------|
@@ -35,8 +35,8 @@ Need Cloudflare account and the following permissions:
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/LemonStudio-hub/namio-world.git
-cd namio-world
+git clone https://github.com/LemonStudio-hub/nomio-world.git
+cd nomio-world
 ```
 
 ### 2. Install Dependencies

@@ -1,12 +1,12 @@
 # Register Account
 
-This chapter introduces how to register a Namio.World account.
+This chapter introduces how to register a Nomio.World account.
 
 ## Registration Process
 
 ### 1. Visit Registration Page
 
-Open your browser and visit [Namio.World](https://nomio-dashboard.pages.dev), click the "Get Started Free" button.
+Open your browser and visit [Nomio.World](https://nomio-dashboard.pages.dev), click the "Get Started Free" button.
 
 ### 2. Fill in Registration Information
 

@@ -34,7 +34,7 @@ const faqs = [
   },
   {
     q: '域名可以自定义吗？',
-    a: '当前仅支持 *.namio.world 子域名。自定义域名支持计划在未来版本中提供。',
+    a: '当前仅支持 *.nomio.world 子域名。自定义域名支持计划在未来版本中提供。',
   },
 ];
 </script>
@@ -43,7 +43,7 @@ const faqs = [
   <div>
     <div class="page-header">
       <h1>帮助文档</h1>
-      <p>了解如何使用 Namio.World 的各项功能</p>
+      <p>了解如何使用 Nomio.World 的各项功能</p>
     </div>
 
     <div class="docs-layout">
@@ -65,7 +65,7 @@ const faqs = [
         <!-- 快速开始 -->
         <section v-if="activeSection === 'quickstart'" class="docs-section">
           <h2>快速开始</h2>
-          <p>只需三步即可开始使用 Namio.World：</p>
+          <p>只需三步即可开始使用 Nomio.World：</p>
           <div class="step-list">
             <div class="doc-step">
               <div class="doc-step-num">1</div>
@@ -85,7 +85,7 @@ const faqs = [
               <div class="doc-step-num">3</div>
               <div>
                 <h3>开始使用</h3>
-                <p>验证通过后，你的域名立即生效。同时你会自动获得一个 @namio.world 的邮箱地址。</p>
+                <p>验证通过后，你的域名立即生效。同时你会自动获得一个 @nomio.world 的邮箱地址。</p>
               </div>
             </div>
           </div>
@@ -104,7 +104,7 @@ const faqs = [
           <h3>回源 Host</h3>
           <p>回源 Host 头会替换为你填写的值。如果你的源站绑定了自定义域名，在此填写该域名。留空则自动使用源站地址的域名。</p>
           <h3>工作原理</h3>
-          <p>当用户访问 <code>alice.namio.world</code> 时：</p>
+          <p>当用户访问 <code>alice.nomio.world</code> 时：</p>
           <ol>
             <li>DNS 解析到 Cloudflare 边缘节点</li>
             <li>Gateway Worker 提取子域名 <code>alice</code></li>
@@ -118,7 +118,7 @@ const faqs = [
         <section v-if="activeSection === 'email'" class="docs-section">
           <h2>邮箱使用</h2>
           <h3>接收邮件</h3>
-          <p>注册后你自动获得 <code>用户名@namio.world</code> 邮箱地址。任何发送到该地址的邮件都会被接收并存储。</p>
+          <p>注册后你自动获得 <code>用户名@nomio.world</code> 邮箱地址。任何发送到该地址的邮件都会被接收并存储。</p>
           <h3>邮件转发</h3>
           <p>在邮箱设置中可以配置转发邮箱。开启后，收到的邮件会同时转发到你指定的外部邮箱（如 Gmail）。</p>
           <h3>存储限制</h3>
@@ -138,7 +138,7 @@ const faqs = [
           <h3>验证步骤</h3>
           <ol>
             <li>在域名管理页面查看验证文件路径和内容</li>
-            <li>在源站创建文件 <code>/.well-known/namio-verify.txt</code></li>
+            <li>在源站创建文件 <code>/.well-known/nomio-verify.txt</code></li>
             <li>文件内容为页面显示的验证 Token</li>
             <li>点击"验证源站"按钮</li>
           </ol>

@@ -1,15 +1,15 @@
 {
-  "name": "namio-docs",
+  "name": "nomio-docs",
   "version": "1.0.0",
-  "description": "Namio.World Documentation",
+  "description": "Nomio.World Documentation",
   "type": "module",
   "scripts": {
     "dev": "vitepress dev",
     "build": "vitepress build",
     "preview": "vitepress preview"
   },
-  "keywords": ["docs", "vitepress", "namio"],
-  "author": "Namio.World",
+  "keywords": ["docs", "vitepress", "nomio"],
+  "author": "Nomio.World",
   "license": "MIT",
   "devDependencies": {
     "vitepress": "^1.6.4",

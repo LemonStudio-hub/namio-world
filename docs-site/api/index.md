@@ -1,6 +1,6 @@
 # API 概览
 
-Namio.World 提供 RESTful API 用于管理域名和邮箱。
+Nomio.World 提供 RESTful API 用于管理域名和邮箱。
 
 ## API 地址
 

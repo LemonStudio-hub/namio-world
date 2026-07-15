@@ -1,6 +1,6 @@
 # API Overview
 
-Namio.World provides RESTful API for managing domains and emails.
+Nomio.World provides RESTful API for managing domains and emails.
 
 ## API URL
 

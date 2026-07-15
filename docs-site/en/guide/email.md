@@ -1,6 +1,6 @@
 # Using Email
 
-This chapter introduces how to register and use Namio.World email.
+This chapter introduces how to register and use Nomio.World email.
 
 ## Register Email
 

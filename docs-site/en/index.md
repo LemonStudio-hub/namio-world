@@ -1,22 +1,22 @@
 ---
 layout: home
-title: Namio.World - Open Source Public Digital Identity Service
+title: Nomio.World - Open Source Public Digital Identity Service
 titleTemplate: Free Domain and Email
 
 hero:
-  name: Namio.World
+  name: Nomio.World
   text: Open Source Public Digital Identity Service
   tagline: Get your-name.nomio.world subdomain and your-name@nomio.world email address for free
   image:
     src: /hero.svg
-    alt: Namio.World
+    alt: Nomio.World
   actions:
     - theme: brand
       text: Get Started
       link: /en/guide/getting-started
     - theme: alt
       text: View on GitHub
-      link: https://github.com/LemonStudio-hub/namio-world
+      link: https://github.com/LemonStudio-hub/nomio-world
 
 features:
   - icon: 🌐

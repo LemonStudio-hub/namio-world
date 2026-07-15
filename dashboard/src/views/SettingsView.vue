@@ -110,14 +110,14 @@ function handleDeleteAccount() {
             <tr>
               <td class="label-cell">域名</td>
               <td>
-                <a :href="`https://${auth.username}.namio.world`" target="_blank">
-                  {{ auth.username }}.namio.world
+                <a :href="`https://${auth.username}.nomio.world`" target="_blank">
+                  {{ auth.username }}.nomio.world
                 </a>
               </td>
             </tr>
             <tr>
               <td class="label-cell">邮箱</td>
-              <td>{{ auth.username }}@namio.world</td>
+              <td>{{ auth.username }}@nomio.world</td>
             </tr>
             <tr>
               <td class="label-cell">注册时间</td>

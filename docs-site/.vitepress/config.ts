@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitepress';
 
 export default defineConfig({
-  title: 'Namio.World',
+  title: 'Nomio.World',
   description: 'Open Source Public Digital Identity Service',
   lastUpdated: true,
   cleanUrls: true,
@@ -9,7 +9,7 @@ export default defineConfig({
   head: [
     ['meta', { name: 'theme-color', content: '#4f46e5' }],
     ['meta', { property: 'og:type', content: 'website' }],
-    ['meta', { property: 'og:title', content: 'Namio.World' }],
+    ['meta', { property: 'og:title', content: 'Nomio.World' }],
     ['meta', { property: 'og:description', content: 'Open Source Public Digital Identity Service' }],
   ],
 
@@ -17,7 +17,7 @@ export default defineConfig({
     root: {
       label: '中文',
       lang: 'zh-CN',
-      title: 'Namio.World',
+      title: 'Nomio.World',
       description: '开源公益数字身份服务',
       themeConfig: {
         nav: [
@@ -104,7 +104,7 @@ export default defineConfig({
     en: {
       label: 'English',
       lang: 'en',
-      title: 'Namio.World',
+      title: 'Nomio.World',
       description: 'Open Source Public Digital Identity Service',
       themeConfig: {
         nav: [
@@ -192,16 +192,16 @@ export default defineConfig({
 
   themeConfig: {
     logo: '/logo.svg',
-    siteTitle: 'Namio.World',
+    siteTitle: 'Nomio.World',
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/LemonStudio-hub/namio-world' },
+      { icon: 'github', link: 'https://github.com/LemonStudio-hub/nomio-world' },
     ],
     search: {
       provider: 'local',
     },
     footer: {
       message: 'Released under the AGPL-3.0 License.',
-      copyright: 'Copyright © 2024 Namio.World',
+      copyright: 'Copyright © 2024 Nomio.World',
     },
   },
 });

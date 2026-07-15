@@ -1,6 +1,6 @@
 # 贡献指南
 
-感谢你对 Namio.World 项目的关注！我们欢迎任何形式的贡献。
+感谢你对 Nomio.World 项目的关注！我们欢迎任何形式的贡献。
 
 ## 如何贡献
 
@@ -63,8 +63,8 @@ docs/update-docs
 #### 克隆项目
 
 ```bash
-git clone https://github.com/LemonStudio-hub/namio-world.git
-cd namio-world
+git clone https://github.com/LemonStudio-hub/nomio-world.git
+cd nomio-world
 ```
 
 #### 安装依赖

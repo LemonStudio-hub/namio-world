@@ -1,12 +1,12 @@
 # 注册账号
 
-本章介绍如何注册 Namio.World 账号。
+本章介绍如何注册 Nomio.World 账号。
 
 ## 注册流程
 
 ### 1. 访问注册页面
 
-打开浏览器，访问 [Namio.World](https://nomio-dashboard.pages.dev)，点击"免费注册"按钮。
+打开浏览器，访问 [Nomio.World](https://nomio-dashboard.pages.dev)，点击"免费注册"按钮。
 
 ### 2. 填写注册信息
 

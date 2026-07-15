@@ -1,10 +1,10 @@
 # Quick Start
 
-Get started with Namio.World in just three steps.
+Get started with Nomio.World in just three steps.
 
 ## Step 1: Register Account
 
-1. Visit [Namio.World](https://nomio-dashboard.pages.dev)
+1. Visit [Nomio.World](https://nomio-dashboard.pages.dev)
 2. Click the "Get Started Free" button
 3. Fill in registration information:
    - **Username** - Will be your subdomain prefix (e.g., `alice`)
