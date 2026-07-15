@@ -103,7 +103,7 @@ const bottomNavItems = computed(() => [
         </svg>
       </button>
       <router-link to="/" class="mobile-logo">
-        <span>Namio</span>.World
+        <span>Nomio</span>.World
       </router-link>
       <div class="mobile-header-actions">
         <button class="locale-toggle-mobile" @click="toggleLocale">
@@ -134,7 +134,7 @@ const bottomNavItems = computed(() => [
     <!-- 侧边栏 -->
     <aside class="app-sidebar" :class="{ open: isMobile && mobileMenuOpen }">
       <router-link to="/" class="logo-link" @click="closeMobileMenu">
-        <div class="logo"><span>Namio</span>.World</div>
+        <div class="logo"><span>Nomio</span>.World</div>
       </router-link>
       <nav>
         <router-link v-for="item in navItems" :key="item.path" :to="item.path" @click="closeMobileMenu">

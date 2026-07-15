@@ -82,7 +82,7 @@ export default {
     title: 'Dashboard',
     welcome: 'Welcome back, {username}',
     quickStart: 'Quick Start',
-    quickStartDesc: 'Welcome to Namio.World! Please complete the following steps to set up your digital identity:',
+    quickStartDesc: 'Welcome to Nomio.World! Please complete the following steps to set up your digital identity:',
     registerDomain: 'Register Domain',
     registerEmail: 'Register Email',
     domain: 'Domain',
@@ -215,14 +215,14 @@ export default {
   // Docs
   docs: {
     title: 'Help Documentation',
-    subtitle: 'Learn how to use Namio.World features',
+    subtitle: 'Learn how to use Nomio.World features',
     quickstart: 'Quick Start',
     domain: 'Domain Config',
     email: 'Email Usage',
     verify: 'Origin Verify',
     faq: 'FAQ',
     quickstartTitle: 'Quick Start',
-    quickstartDesc: 'Get started with Namio.World in just three steps:',
+    quickstartDesc: 'Get started with Nomio.World in just three steps:',
     step1Title: 'Register Account',
     step1Desc: 'Visit the registration page, choose a username (will be your subdomain prefix), fill in your origin HTTPS URL, and set a password.',
     step2Title: 'Verify Origin',
@@ -272,9 +272,9 @@ export default {
   // About
   about: {
     title: 'About',
-    subtitle: 'Namio.World Project Introduction and Technical Architecture',
+    subtitle: 'Nomio.World Project Introduction and Technical Architecture',
     projectIntro: 'Project Introduction',
-    projectIntroDesc1: 'Namio.World is a public welfare digital identity infrastructure service based on the Cloudflare edge computing platform. The name comes from Name + I/O, meaning "entry service for domains and emails". The project uses the AGPL-3.0 open source license, and all code is completely transparent.',
+    projectIntroDesc1: 'Nomio.World is a public welfare digital identity infrastructure service based on the Cloudflare edge computing platform. The name comes from Name + I/O, meaning "entry service for domains and emails". The project uses the AGPL-3.0 open source license, and all code is completely transparent.',
     projectIntroDesc2: 'We believe that domains and email addresses are the most basic identity markers in the digital world. Everyone should be able to get a free domain and email address.',
     coreValues: 'Core Values',
     openSource: 'Open Source',
@@ -314,7 +314,7 @@ export default {
     getStarted: 'Get Started Free',
     learnMore: 'Learn More',
     features: 'Core Features',
-    featuresDesc: 'Namio.World provides a complete digital identity solution, from domain to email, one-stop service.',
+    featuresDesc: 'Nomio.World provides a complete digital identity solution, from domain to email, one-stop service.',
     freeDomain: 'Free Domain',
     freeDomainDesc: 'Get your-name.nomio.world subdomain for free, supports custom origin pointing.',
     freeEmail: 'Free Email',
@@ -342,7 +342,7 @@ export default {
     ctaDesc: 'Register for free and get your digital identity instantly.',
     ctaButton: 'Register Free',
     footer: 'Open Source Public Digital Identity Service',
-    copyright: '© 2024 Namio.World. Open source under AGPL-3.0 license.',
+    copyright: '© 2024 Nomio.World. Open source under AGPL-3.0 license.',
   },
 
   // Theme

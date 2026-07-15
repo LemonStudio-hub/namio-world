@@ -84,7 +84,7 @@ onMounted(async () => {
       <div v-if="!hasDomain || !hasEmail" class="card" style="margin-bottom: 24px; border-color: var(--color-primary-muted);">
         <div class="card-title" style="color: var(--color-primary);">快速开始</div>
         <p style="font-size: 0.875rem; color: var(--color-text-secondary); margin-bottom: 16px; line-height: 1.6">
-          欢迎使用 Namio.World！请先完成以下步骤来设置你的数字身份：
+          欢迎使用 Nomio.World！请先完成以下步骤来设置你的数字身份：
         </p>
         <div style="display: flex; gap: 12px; flex-wrap: wrap;">
           <router-link v-if="!hasDomain" to="/domain" class="btn btn-primary">

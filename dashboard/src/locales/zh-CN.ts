@@ -82,7 +82,7 @@ export default {
     title: '仪表盘',
     welcome: '欢迎回来，{username}',
     quickStart: '快速开始',
-    quickStartDesc: '欢迎使用 Namio.World！请先完成以下步骤来设置你的数字身份：',
+    quickStartDesc: '欢迎使用 Nomio.World！请先完成以下步骤来设置你的数字身份：',
     registerDomain: '注册二级域名',
     registerEmail: '注册邮箱',
     domain: '域名',
@@ -215,14 +215,14 @@ export default {
   // 帮助文档
   docs: {
     title: '帮助文档',
-    subtitle: '了解如何使用 Namio.World 的各项功能',
+    subtitle: '了解如何使用 Nomio.World 的各项功能',
     quickstart: '快速开始',
     domain: '域名配置',
     email: '邮箱使用',
     verify: '源站验证',
     faq: '常见问题',
     quickstartTitle: '快速开始',
-    quickstartDesc: '只需三步即可开始使用 Namio.World：',
+    quickstartDesc: '只需三步即可开始使用 Nomio.World：',
     step1Title: '注册账号',
     step1Desc: '访问注册页面，选择用户名（将作为你的二级域名前缀），填写源站 HTTPS 地址，设置密码。',
     step2Title: '验证源站',
@@ -272,9 +272,9 @@ export default {
   // 关于
   about: {
     title: '关于',
-    subtitle: 'Namio.World 项目介绍与技术架构',
+    subtitle: 'Nomio.World 项目介绍与技术架构',
     projectIntro: '项目简介',
-    projectIntroDesc1: 'Namio.World 是一个基于 Cloudflare 边缘计算平台的公益数字身份基建服务。名称取自 Name + I/O，寓意"域名与邮箱的入口服务"。项目采用 AGPL-3.0 开源协议，所有代码完全公开透明。',
+    projectIntroDesc1: 'Nomio.World 是一个基于 Cloudflare 边缘计算平台的公益数字身份基建服务。名称取自 Name + I/O，寓意"域名与邮箱的入口服务"。项目采用 AGPL-3.0 开源协议，所有代码完全公开透明。',
     projectIntroDesc2: '我们相信，域名和邮箱是数字世界最基本的身份标识。每个人都应该能够免费获得一个属于自己的域名和邮箱地址。',
     coreValues: '核心价值',
     openSource: '开源透明',
@@ -314,7 +314,7 @@ export default {
     getStarted: '免费注册',
     learnMore: '了解更多',
     features: '核心特性',
-    featuresDesc: 'Namio.World 提供完整的数字身份解决方案，从域名到邮箱，一站式服务。',
+    featuresDesc: 'Nomio.World 提供完整的数字身份解决方案，从域名到邮箱，一站式服务。',
     freeDomain: '免费域名',
     freeDomainDesc: '免费获得 your-name.nomio.world 二级域名，支持自定义源站指向。',
     freeEmail: '免费邮箱',
@@ -342,7 +342,7 @@ export default {
     ctaDesc: '免费注册，即刻拥有你的数字身份。',
     ctaButton: '免费注册',
     footer: '开源公益数字身份服务',
-    copyright: '© 2024 Namio.World. 基于 AGPL-3.0 协议开源。',
+    copyright: '© 2024 Nomio.World. 基于 AGPL-3.0 协议开源。',
   },
 
   // 主题
