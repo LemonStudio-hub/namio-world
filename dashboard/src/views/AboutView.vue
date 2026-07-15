@@ -138,6 +138,12 @@ const techs = [
   transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.reveal:nth-child(1) { transition-delay: 0.1s; }
+.reveal:nth-child(2) { transition-delay: 0.2s; }
+.reveal:nth-child(3) { transition-delay: 0.3s; }
+.reveal:nth-child(4) { transition-delay: 0.4s; }
+.reveal:nth-child(5) { transition-delay: 0.5s; }
+
 .values-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -147,7 +153,15 @@ const techs = [
   padding: 16px;
   background: var(--color-bg);
   border-radius: var(--radius);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+.value-item:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  background: var(--color-surface);
+}
+
 .value-item h3 {
   font-size: 0.875rem;
   font-weight: 700;
@@ -171,7 +185,16 @@ const techs = [
   justify-content: space-between;
   padding: 10px 0;
   border-bottom: 1px solid var(--color-border-light);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+.tech-row:hover {
+  transform: translateX(4px);
+  background: var(--color-primary-soft);
+  padding-left: 8px;
+  border-radius: var(--radius);
+}
+
 .tech-row:last-child { border-bottom: none; }
 .tech-info {
   display: flex;
@@ -195,6 +218,12 @@ const techs = [
   background: var(--color-primary-soft);
   padding: 2px 10px;
   border-radius: 999px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tech-row:hover .tech-cat {
+  background: var(--color-primary);
+  color: white;
 }
 
 .label-cell {

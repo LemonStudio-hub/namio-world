@@ -70,7 +70,7 @@ onMounted(async () => {
     </div>
 
     <template v-else>
-      <div class="stats-grid">
+      <div class="stats-grid stagger">
         <div class="stat-card">
           <div class="label">域名</div>
           <div class="value" style="font-size: 1rem">{{ auth.username }}.nomio.world</div>
@@ -144,9 +144,11 @@ onMounted(async () => {
             </thead>
             <tbody>
               <tr
-                v-for="mail in mailData.mails"
+                v-for="(mail, index) in mailData.mails"
                 :key="mail.id"
                 :class="{ unread: !mail.is_read }"
+                :style="{ animationDelay: `${index * 0.1}s` }"
+                class="mail-row"
               >
                 <td>{{ mail.from_address }}</td>
                 <td>{{ mail.subject }}</td>
@@ -162,3 +164,10 @@ onMounted(async () => {
     </template>
   </div>
 </template>
+
+<style scoped>
+.mail-row {
+  animation: slideInUp 0.5s var(--ease);
+  animation-fill-mode: both;
+}
+</style>

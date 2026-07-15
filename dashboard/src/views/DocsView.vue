@@ -187,16 +187,41 @@ const faqs = [
   font-weight: 500;
   color: var(--color-text-secondary);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
 }
+
+.docs-nav-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--color-primary);
+  transform: scaleY(0);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .docs-nav-item:hover {
   background: var(--color-primary-soft);
   color: var(--color-primary);
+  transform: translateX(4px);
 }
+
+.docs-nav-item:hover::before {
+  transform: scaleY(1);
+}
+
 .docs-nav-item.active {
   background: var(--color-primary-soft);
   color: var(--color-primary);
   font-weight: 600;
+}
+
+.docs-nav-item.active::before {
+  transform: scaleY(1);
 }
 .docs-content {
   flex: 1;
@@ -253,7 +278,21 @@ const faqs = [
   padding: 20px;
   background: var(--color-bg);
   border-radius: var(--radius-lg);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: slideInUp 0.5s var(--ease);
+  animation-fill-mode: both;
 }
+
+.doc-step:nth-child(1) { animation-delay: 0.1s; }
+.doc-step:nth-child(2) { animation-delay: 0.2s; }
+.doc-step:nth-child(3) { animation-delay: 0.3s; }
+
+.doc-step:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  background: var(--color-surface);
+}
+
 .doc-step-num {
   width: 36px;
   height: 36px;
@@ -266,6 +305,11 @@ const faqs = [
   font-size: 0.875rem;
   font-weight: 800;
   flex-shrink: 0;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.doc-step:hover .doc-step-num {
+  transform: scale(1.1);
 }
 .doc-step h3 {
   font-size: 0.9375rem;
@@ -285,7 +329,24 @@ const faqs = [
   padding: 20px;
   background: var(--color-bg);
   border-radius: var(--radius-lg);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: slideInUp 0.5s var(--ease);
+  animation-fill-mode: both;
 }
+
+.faq-item:nth-child(1) { animation-delay: 0.1s; }
+.faq-item:nth-child(2) { animation-delay: 0.15s; }
+.faq-item:nth-child(3) { animation-delay: 0.2s; }
+.faq-item:nth-child(4) { animation-delay: 0.25s; }
+.faq-item:nth-child(5) { animation-delay: 0.3s; }
+.faq-item:nth-child(6) { animation-delay: 0.35s; }
+
+.faq-item:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  background: var(--color-surface);
+}
+
 .faq-item h3 {
   font-size: 0.9375rem;
   font-weight: 700;

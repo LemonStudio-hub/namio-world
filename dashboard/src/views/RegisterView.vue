@@ -46,7 +46,7 @@ async function handleSubmit() {
 
       <div v-if="error" class="alert alert-error">{{ error }}</div>
 
-      <form @submit.prevent="handleSubmit">
+      <form @submit.prevent="handleSubmit" class="stagger">
         <div class="form-group">
           <label for="username">用户名</label>
           <input
@@ -55,6 +55,7 @@ async function handleSubmit() {
             type="text"
             placeholder="如: alice"
             autocomplete="username"
+            class="focus-ring"
           />
           <div class="hint">注册后将获得 alice.nomio.world 域名</div>
         </div>
@@ -66,6 +67,7 @@ async function handleSubmit() {
             v-model="originUrl"
             type="url"
             placeholder="https://myapp.vercel.app"
+            class="focus-ring"
           />
           <div class="hint">你的网站必须支持 HTTPS</div>
         </div>
@@ -78,6 +80,7 @@ async function handleSubmit() {
             type="password"
             placeholder="至少 8 个字符"
             autocomplete="new-password"
+            class="focus-ring"
           />
         </div>
 
@@ -89,6 +92,7 @@ async function handleSubmit() {
             type="password"
             placeholder="再次输入密码"
             autocomplete="new-password"
+            class="focus-ring"
           />
         </div>
 

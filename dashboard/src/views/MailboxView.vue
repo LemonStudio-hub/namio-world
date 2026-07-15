@@ -223,9 +223,11 @@ onMounted(() => loadMails());
             </thead>
             <tbody>
               <tr
-                v-for="mail in mails"
+                v-for="(mail, index) in mails"
                 :key="mail.id"
                 :class="{ unread: !mail.is_read }"
+                :style="{ animationDelay: `${index * 0.05}s` }"
+                class="mail-row"
                 style="cursor: pointer"
               >
                 <td @click.stop>
@@ -289,6 +291,7 @@ onMounted(() => loadMails());
                 v-model="forwardEmail"
                 type="email"
                 placeholder="your-email@gmail.com（留空则不转发）"
+                class="focus-ring"
               />
               <div class="hint">收到的邮件将自动转发到此邮箱</div>
             </div>
@@ -315,3 +318,10 @@ onMounted(() => loadMails());
     </template>
   </div>
 </template>
+
+<style scoped>
+.mail-row {
+  animation: slideInUp 0.5s var(--ease);
+  animation-fill-mode: both;
+}
+</style>

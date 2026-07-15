@@ -23,7 +23,11 @@ const bottomNavItems = [
 
 <template>
   <div v-if="isPublicPage">
-    <router-view />
+    <router-view v-slot="{ Component }">
+      <transition name="fade-slide" mode="out-in">
+        <component :is="Component" />
+      </transition>
+    </router-view>
   </div>
 
   <div v-else class="app-layout">
@@ -60,7 +64,11 @@ const bottomNavItems = [
       </div>
     </aside>
     <main class="app-main">
-      <router-view />
+      <router-view v-slot="{ Component }">
+        <transition name="fade-slide" mode="out-in">
+          <component :is="Component" />
+        </transition>
+      </router-view>
     </main>
   </div>
 </template>
@@ -68,7 +76,14 @@ const bottomNavItems = [
 <style scoped>
 .logo-link {
   text-decoration: none;
+  display: block;
+  margin-bottom: 8px;
 }
+
+.logo-link:hover {
+  transform: none;
+}
+
 .nav-bottom {
   margin-top: auto;
   display: flex;
@@ -79,6 +94,7 @@ const bottomNavItems = [
   padding-top: 12px;
   margin-top: 12px;
 }
+
 .nav-bottom a {
   display: flex;
   align-items: center;
@@ -88,10 +104,40 @@ const bottomNavItems = [
   color: var(--color-text-muted);
   font-size: 0.8125rem;
   font-weight: 500;
-  transition: all 0.2s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
 }
+
+.nav-bottom a::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--color-primary);
+  transform: scaleY(0);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .nav-bottom a:hover {
   background: var(--color-primary-soft);
   color: var(--color-primary);
+  transform: translateX(4px);
+}
+
+.nav-bottom a:hover::before {
+  transform: scaleY(1);
+}
+
+.nav-bottom a.router-link-active {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.nav-bottom a.router-link-active::before {
+  transform: scaleY(1);
 }
 </style>

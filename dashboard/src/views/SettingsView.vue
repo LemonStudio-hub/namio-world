@@ -162,6 +162,7 @@ function handleDeleteAccount() {
               type="password"
               placeholder="输入当前密码"
               autocomplete="current-password"
+              class="focus-ring"
             />
           </div>
           <div class="form-group">
@@ -172,6 +173,7 @@ function handleDeleteAccount() {
               type="password"
               placeholder="至少 8 个字符"
               autocomplete="new-password"
+              class="focus-ring"
             />
           </div>
           <div class="form-group">
@@ -182,6 +184,7 @@ function handleDeleteAccount() {
               type="password"
               placeholder="再次输入新密码"
               autocomplete="new-password"
+              class="focus-ring"
             />
           </div>
           <button class="btn btn-primary" type="submit" :disabled="saving">

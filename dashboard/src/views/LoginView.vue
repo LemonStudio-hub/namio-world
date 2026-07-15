@@ -30,7 +30,7 @@ async function handleSubmit() {
 
       <div v-if="error" class="alert alert-error">{{ error }}</div>
 
-      <form @submit.prevent="handleSubmit">
+      <form @submit.prevent="handleSubmit" class="stagger">
         <div class="form-group">
           <label for="username">用户名</label>
           <input
@@ -39,6 +39,7 @@ async function handleSubmit() {
             type="text"
             placeholder="输入你的用户名"
             autocomplete="username"
+            class="focus-ring"
           />
         </div>
 
@@ -50,6 +51,7 @@ async function handleSubmit() {
             type="password"
             placeholder="输入密码"
             autocomplete="current-password"
+            class="focus-ring"
           />
         </div>
 

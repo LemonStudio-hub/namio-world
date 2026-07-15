@@ -125,6 +125,7 @@ async function handleVerify() {
               v-model="originUrl"
               type="url"
               placeholder="https://myapp.vercel.app"
+              class="focus-ring"
             />
             <div class="hint">必须以 https:// 开头，不支持 IP 地址</div>
           </div>
@@ -136,6 +137,7 @@ async function handleVerify() {
               v-model="originHost"
               type="text"
               placeholder="留空则自动使用源站域名"
+              class="focus-ring"
             />
             <div class="hint">如果你的源站绑定了自定义域名，在此填写</div>
           </div>
