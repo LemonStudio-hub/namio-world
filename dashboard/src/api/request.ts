@@ -5,8 +5,11 @@
 
 import { ofetch } from 'ofetch';
 
+// API 基础地址
+const API_BASE = import.meta.env.VITE_API_BASE || 'https://nomio-api.lemonhub.workers.dev/api';
+
 const request = ofetch.create({
-  baseURL: '/api',
+  baseURL: API_BASE,
   timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
