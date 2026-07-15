@@ -1,6 +1,6 @@
 /**
  * Nomio API Worker
- * Hono 后端：认证、域名管理、邮件管理、邮箱设置
+ * Hono 后端：认证、域名管理、邮件管理、邮箱设置、WAF规则
  */
 
 import { Hono } from 'hono';
@@ -10,6 +10,7 @@ import { authRoutes } from './routes/auth';
 import { domainRoutes } from './routes/domains';
 import { mailRoutes } from './routes/mails';
 import { settingsRoutes } from './routes/settings';
+import { wafRoutes } from './routes/waf';
 
 export interface Env {
   DB: D1Database;
@@ -84,11 +85,20 @@ app.use('/api/settings/*', async (c, next) => {
   const jwtMiddleware = jwt({ secret: c.env.JWT_SECRET });
   return jwtMiddleware(c, next);
 });
+app.use('/api/waf/*', async (c, next) => {
+  const jwtMiddleware = jwt({ secret: c.env.JWT_SECRET });
+  return jwtMiddleware(c, next);
+});
+app.use('/api/waf', async (c, next) => {
+  const jwtMiddleware = jwt({ secret: c.env.JWT_SECRET });
+  return jwtMiddleware(c, next);
+});
 
 // ---- 受保护路由 ----
 app.route('/api/domains', domainRoutes);
 app.route('/api/mails', mailRoutes);
 app.route('/api/settings', settingsRoutes);
+app.route('/api/waf', wafRoutes);
 
 // ---- 健康检查 ----
 app.get('/api/health', (c) => {

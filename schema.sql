@@ -52,3 +52,54 @@ CREATE INDEX IF NOT EXISTS idx_mails_received_at ON mails(received_at);
 CREATE INDEX IF NOT EXISTS idx_mails_message_id ON mails(message_id);
 CREATE INDEX IF NOT EXISTS idx_mails_user_read ON mails(user_id, is_read);
 CREATE INDEX IF NOT EXISTS idx_mails_user_starred ON mails(user_id, is_starred);
+
+-- ============================================================
+-- WAF 规则表
+-- ============================================================
+CREATE TABLE IF NOT EXISTS waf_rules (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  name TEXT NOT NULL,                            -- 规则名称
+  description TEXT,                              -- 规则描述
+  rule_type TEXT NOT NULL                        -- 规则类型
+    CHECK (rule_type IN ('block_ip', 'block_country', 'block_path', 'block_user_agent',
+                         'rate_limit', 'geo_block', 'custom_header', 'sql_injection',
+                         'xss_protection', 'bot_protection', 'ddos_protection')),
+  pattern TEXT NOT NULL,                         -- 匹配模式（IP、路径、正则等）
+  action TEXT DEFAULT 'block'                    -- 执行动作
+    CHECK (action IN ('block', 'challenge', 'allow', 'log')),
+  priority INTEGER DEFAULT 100,                  -- 优先级（数字越小优先级越高）
+  is_enabled BOOLEAN DEFAULT 1,                  -- 是否启用
+  is_preset BOOLEAN DEFAULT 0,                   -- 是否预设规则
+  config TEXT,                                   -- JSON 配置（如限速参数）
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_waf_rules_user_id ON waf_rules(user_id);
+CREATE INDEX IF NOT EXISTS idx_waf_rules_type ON waf_rules(rule_type);
+CREATE INDEX IF NOT EXISTS idx_waf_rules_enabled ON waf_rules(user_id, is_enabled);
+
+-- ============================================================
+-- WAF 日志表
+-- ============================================================
+CREATE TABLE IF NOT EXISTS waf_logs (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  rule_id INTEGER,                               -- 触发的规则ID（NULL表示默认规则）
+  rule_name TEXT,                                -- 规则名称
+  action_taken TEXT NOT NULL,                    -- 执行的动作
+  client_ip TEXT NOT NULL,                       -- 客户端IP
+  request_path TEXT,                             -- 请求路径
+  request_method TEXT,                           -- 请求方法
+  user_agent TEXT,                               -- User-Agent
+  country_code TEXT,                             -- 国家代码
+  is_blocked BOOLEAN DEFAULT 1,                  -- 是否被拦截
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_waf_logs_user_id ON waf_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_waf_logs_created_at ON waf_logs(created_at);
+CREATE INDEX IF NOT EXISTS idx_waf_logs_rule_id ON waf_logs(rule_id);
